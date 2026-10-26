@@ -14,10 +14,3 @@ dependencies = [
     "torch>=2.14.1",
     "torchvision>=0.29.1",
 ]
-
-[project.scripts]
-explainable-ai-project = "explainable_ai_project:main"
-
-[build-system]
-requires = ["uv_build>=0.13.4,<0.14.0"]
-build-backend = "uv_build"
