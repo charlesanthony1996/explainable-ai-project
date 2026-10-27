@@ -1,0 +1,4 @@
+Setup
+
+1. create the folders for the datasets
+2. set the seed
