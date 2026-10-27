@@ -7,6 +7,7 @@ from explainable_ai_project.leakage_scan import run_leakage_scan
 from explainable_ai_project.derived_columns import find_derived_columns
 from explainable_ai_project.common_columns import keep_common_features
 from explainable_ai_project.harmonize import harmonise_labels_and_units
+from explainable_ai_project.cleaning import check_ranges_and_clean
 
 
 def main():
@@ -20,8 +21,12 @@ def main():
     find_derived_columns(loaded_datasets)
 
     common = keep_common_features(loaded_datasets)
+
+    harmonized = harmonise_labels_and_units(common)
+
+    check_ranges_and_clean(harmonized)
+
     
-    harmonise_labels_and_units(common)
 
 
 if __name__ == "__main__":
