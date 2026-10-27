@@ -9,6 +9,8 @@ from explainable_ai_project.common_columns import keep_common_features
 from explainable_ai_project.harmonize import harmonise_labels_and_units
 from explainable_ai_project.cleaning import check_ranges_and_clean
 
+from explainable_ai_project.add_features import add_loan_to_income_and_age_groups
+
 
 def main():
 
@@ -24,10 +26,13 @@ def main():
 
     harmonized = harmonise_labels_and_units(common)
 
-    check_ranges_and_clean(harmonized)
+    cleaned = check_ranges_and_clean(harmonized)
+
+    add_loan_to_income_and_age_groups(cleaned)
 
     
 
 
 if __name__ == "__main__":
     main()
+
