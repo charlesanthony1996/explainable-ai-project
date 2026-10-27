@@ -1,3 +1,25 @@
 figma link - https://www.figma.com/board/8pEhbAZnCNjNATDcDyTP8u/ExplainableAI-Architecture?node-id=0-1&t=xVFjzuzwr8MBQ5g7-1
 
 Team division
+
+Team 1 tasks
+
+1A (logging things that are done)
+
+load both raw datasets
+missing duplicates
+leakage scan
+columns derived from the amount
+
+
+1B
+
+
+
+1C
+
+
+
+1D (dayas and rusty)
+
+collect documents (in progress)
