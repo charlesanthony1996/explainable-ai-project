@@ -10,6 +10,8 @@ load both raw datasets
 missing duplicates
 leakage scan
 columns derived from the amount
+keep 10 common features
+
 
 
 1B (charles)
