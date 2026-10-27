@@ -6,6 +6,7 @@ from explainable_ai_project.missing_and_duplicates import check_missing_and_dupl
 from explainable_ai_project.leakage_scan import run_leakage_scan
 from explainable_ai_project.derived_columns import find_derived_columns
 from explainable_ai_project.common_columns import keep_common_features
+from explainable_ai_project.harmonize import harmonise_labels_and_units
 
 
 def main():
@@ -14,7 +15,8 @@ def main():
     check_missing_and_duplicates(loaded_datasets)
     run_leakage_scan(loaded_datasets)
     find_derived_columns(loaded_datasets)
-    keep_common_features(loaded_datasets)
+    common = keep_common_features(loaded_datasets)
+    harmonise_labels_and_units(common)
 
 
 if __name__ == "__main__":
