@@ -54,15 +54,60 @@ def download_dataset(dataset_name):
  
     print(dataset_name + ": saved to", target_file.relative_to(project_root))
 
-
-def load_dataset():
-
-    pass
+#  Read one dataset and check its size and its approval column
+def load_dataset(dataset_name):
+ 
+    settings = datasets[dataset_name]
+    file_path = settings["file"]
+ 
+    raw_data = pd.read_csv(file_path)
+ 
+    row_count = raw_data.shape[0]
+    column_count = raw_data.shape[1]
+    print(dataset_name + ":", row_count, "rows x", column_count, "columns")
+ 
+    # Check 1: the size is what we expect
+    expected_rows = settings["expected_rows"]
+    expected_columns = settings["expected_columns"]
+    rows_match = row_count == expected_rows
+    columns_match = column_count == expected_columns
+ 
+    if rows_match and columns_match:
+        print("  size OK")
+    else:
+        print("  WARNING: expected", expected_rows, "x", expected_columns, "- the file may have changed")
+ 
+    # Check 2: the approval column exists
+    label_column = settings["label_column"]
+    label_exists = label_column in raw_data.columns
+ 
+    if not label_exists:
+        message = dataset_name + " has no column called " + label_column
+        raise ValueError(message)
+ 
+    approval_rate = raw_data[label_column].mean()
+    approval_percent = round(approval_rate * 100, 1)
+    print("  approval rate:", approval_percent, "%")
+ 
+    return raw_data
 
 def load_both_raw_datasets():
 
     print("loaded the datasets")
     # pass
+
+# Download (first time only) and load both datasets.
+# Returns a dictionary: {"dataset_1": table, "dataset_2": table}
+def load_both_raw_datasets():
+ 
+    raw_datasets = {}
+ 
+    for dataset_name in datasets:
+        download_dataset(dataset_name)
+        raw_data = load_dataset(dataset_name)
+        raw_datasets[dataset_name] = raw_data
+ 
+    return raw_datasets
 
 if __name__ == "__main__":
 
