@@ -109,7 +109,7 @@ def load_both_raw_datasets():
  
     return raw_datasets
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    load_both_raw_datasets()
-    print("loading from load.py")
+#     load_both_raw_datasets()
+#     print("loading from load.py")
