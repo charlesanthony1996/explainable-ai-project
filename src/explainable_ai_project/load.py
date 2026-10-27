@@ -30,9 +30,29 @@ datasets = {
     }
 }
 
-def download_dataset():
+#  Download one dataset into datasets/raw/, unless it is already there.
+def download_dataset(dataset_name):
 
-    pass
+    settings = datasets[dataset_name]
+    url = settings["url"]
+    target_file = settings["file"]
+ 
+    file_exists = target_file.exists()
+    if file_exists:
+        print(dataset_name + ": already downloaded")
+        return
+ 
+    print(dataset_name + ": downloading ...")
+    response = requests.get(url, timeout=120)
+ 
+    # Stop with a clear error if GitHub returns an error page
+    response.raise_for_status()
+ 
+    raw_datasets_folder.mkdir(parents=True, exist_ok=True)
+    file_bytes = response.content
+    target_file.write_bytes(file_bytes)
+ 
+    print(dataset_name + ": saved to", target_file.relative_to(project_root))
 
 
 def load_dataset():
