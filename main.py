@@ -12,10 +12,15 @@ from explainable_ai_project.harmonize import harmonise_labels_and_units
 def main():
 
     loaded_datasets = load_both_raw_datasets()
+
     check_missing_and_duplicates(loaded_datasets)
+
     run_leakage_scan(loaded_datasets)
+
     find_derived_columns(loaded_datasets)
+
     common = keep_common_features(loaded_datasets)
+    
     harmonise_labels_and_units(common)
 
 
