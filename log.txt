@@ -12,11 +12,15 @@ leakage scan
 columns derived from the amount
 
 
-1B
+1B (charles)
 
 
 
-1C
+
+
+1C (charles)
+
+Approval rates by age group (not yet)
 
 
 
