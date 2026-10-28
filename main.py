@@ -31,6 +31,9 @@ from explainable_ai_project.ebm_comparison import run_ebm_comparison
 from explainable_ai_project.calibrate import calibrate_models
 from explainable_ai_project.recheck_monotonic import recheck_monotonicity
 
+# test once and metrics
+from explainable_ai_project.testing_once import test_once
+
 def main():
 
     loaded_datasets = load_both_raw_datasets()
@@ -74,6 +77,8 @@ def main():
     calibrate_models()
 
     recheck_monotonicity()
+
+    test_once()
 
 
 
