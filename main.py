@@ -18,6 +18,8 @@ from explainable_ai_project.governance_report import write_reports_and_governanc
 
 # from the train folder
 from explainable_ai_project.load_split import check_all_splits_load
+from explainable_ai_project.logistic_baseline import train_logistic_baselines
+from explainable_ai_project.sweep_problem import show_sweep_problem
 
 def main():
 
@@ -46,9 +48,11 @@ def main():
     # train and test the models
     check_all_splits_load()
 
+    train_logistic_baselines()
 
+    # from sweep_problem.py
+    show_sweep_problem()
 
-    
 
 
 if __name__ == "__main__":
