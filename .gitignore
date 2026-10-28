@@ -25,7 +25,10 @@ models
 docs
 /docs
 
-.rag_docs
-rag_docs
-/rag_docs
+# .rag_docs
+# rag_docs
+# /rag_docs
 
+.rag_index
+rag_index
+/rag_index

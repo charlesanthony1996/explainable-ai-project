@@ -60,6 +60,12 @@ from explainable_ai_project.fairness_report_2 import write_fairness_report
 # collecting documents for rag
 from explainable_ai_project.documents_for_rag import collect_documents
 
+# extract and clean text
+from explainable_ai_project.extract_clean import extract_and_clean_text
+
+# chunking
+from explainable_ai_project.chunk import chunk_documents
+
 def main():
 
     loaded_datasets = load_both_raw_datasets()
@@ -124,7 +130,9 @@ def main():
 
     collect_documents()
 
+    extract_and_clean_text()
 
+    chunk_documents()
 
 
 
