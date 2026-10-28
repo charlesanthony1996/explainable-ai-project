@@ -16,6 +16,8 @@ from explainable_ai_project.split import split_70_15_15
 from explainable_ai_project.preprocessor import fit_preprocessors
 from explainable_ai_project.governance_report import write_reports_and_governance_log
 
+# from the train folder
+from explainable_ai_project.load_split import check_all_splits_load
 
 def main():
 
@@ -40,6 +42,9 @@ def main():
     fit_preprocessors(splits_per_dataset)
 
     write_reports_and_governance_log()
+
+    # train and test the models
+    check_all_splits_load()
 
 
 
