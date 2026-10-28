@@ -13,6 +13,8 @@ from explainable_ai_project.add_features import add_loan_to_income_and_age_group
 from explainable_ai_project.split import split_70_15_15
 from explainable_ai_project.preprocessor import fit_preprocessors
 
+from explainable_ai_project.governance_report import write_reports_and_governance_log
+
 
 def main():
 
@@ -35,6 +37,8 @@ def main():
     splits_per_dataset = split_70_15_15(final)
 
     fit_preprocessors(splits_per_dataset)
+
+    write_reports_and_governance_log()
 
 
 
