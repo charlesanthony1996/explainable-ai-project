@@ -10,6 +10,7 @@ from explainable_ai_project.harmonize import harmonise_labels_and_units
 from explainable_ai_project.cleaning import check_ranges_and_clean
 
 from explainable_ai_project.add_features import add_loan_to_income_and_age_groups
+from explainable_ai_project.split import split_70_15_15
 
 
 def main():
@@ -28,11 +29,12 @@ def main():
 
     cleaned = check_ranges_and_clean(harmonized)
 
-    add_loan_to_income_and_age_groups(cleaned)
+    final = add_loan_to_income_and_age_groups(cleaned)
+
+    split_70_15_15(final)
 
     
 
 
 if __name__ == "__main__":
     main()
-
