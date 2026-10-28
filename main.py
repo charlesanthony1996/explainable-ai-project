@@ -36,13 +36,29 @@ from explainable_ai_project.testing_once import test_once
 from explainable_ai_project.test_set_sweep import sweep_on_test_set
 
 # save, log and generate model card
-from explainable_ai_project.model_card import save_log_and_write_model_card
+# from explainable_ai_project.model_card import save_log_and_write_model_card
+from explainable_ai_project.model_card_2 import save_log_and_write_model_card
 
 # approval rates by age group
 from explainable_ai_project.age_approval import approval_rates_by_age_group
 
 # maximum amount by age group
 from explainable_ai_project.maximum_age_fairness import maximum_amount_by_age_group
+
+# calibration by age group
+from explainable_ai_project.age_group_calibration import calibration_by_age_group
+
+# choosing deferral rules
+from explainable_ai_project.deferral import choose_deferral_rules
+
+from explainable_ai_project.intervention_age import intervention_remove_age
+
+# generate fairness report
+# from explainable_ai_project.fairness_report import write_fairness_report
+from explainable_ai_project.fairness_report_2 import write_fairness_report
+
+# collecting documents for rag
+from explainable_ai_project.documents_for_rag import collect_documents
 
 def main():
 
@@ -97,6 +113,16 @@ def main():
     approval_rates_by_age_group()
 
     maximum_amount_by_age_group()
+
+    calibration_by_age_group()
+
+    choose_deferral_rules()
+
+    intervention_remove_age()
+
+    write_fairness_report()
+
+    collect_documents()
 
 
 
