@@ -1,0 +1,22 @@
+[
+  "age",
+  "dependents",
+  "annual_income",
+  "credit_score",
+  "loan_amount",
+  "loan_term_months",
+  "loan_to_income",
+  "marital_status_Divorced",
+  "marital_status_Married",
+  "marital_status_Single",
+  "education_High School",
+  "education_Postgraduate",
+  "education_Undergraduate",
+  "employment_status_Employed",
+  "employment_status_Self-Employed",
+  "employment_status_Unemployed",
+  "loan_purpose_Education",
+  "loan_purpose_Home",
+  "loan_purpose_Personal or other",
+  "loan_purpose_Vehicle"
+]

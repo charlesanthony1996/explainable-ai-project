@@ -11,6 +11,7 @@ from explainable_ai_project.cleaning import check_ranges_and_clean
 
 from explainable_ai_project.add_features import add_loan_to_income_and_age_groups
 from explainable_ai_project.split import split_70_15_15
+from explainable_ai_project.preprocessor import fit_preprocessors
 
 
 def main():
@@ -31,7 +32,11 @@ def main():
 
     final = add_loan_to_income_and_age_groups(cleaned)
 
-    split_70_15_15(final)
+    splits_per_dataset = split_70_15_15(final)
+
+    fit_preprocessors(splits_per_dataset)
+
+
 
     
 

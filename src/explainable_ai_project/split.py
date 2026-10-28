@@ -260,15 +260,15 @@ def split_70_15_15(final_datasets):
     return all_splits
 
 
-if __name__ == "__main__":
-    loaded_datasets = load_both_raw_datasets()
-    print()
-    common = keep_common_features(loaded_datasets)
-    print()
-    harmonised = harmonise_labels_and_units(common)
-    print()
-    cleaned = check_ranges_and_clean(harmonised)
-    print()
-    final = add_loan_to_income_and_age_groups(cleaned)
-    print()
-    split_70_15_15(final)
+# if __name__ == "__main__":
+#     loaded_datasets = load_both_raw_datasets()
+#     print()
+#     common = keep_common_features(loaded_datasets)
+#     print()
+#     harmonised = harmonise_labels_and_units(common)
+#     print()
+#     cleaned = check_ranges_and_clean(harmonised)
+#     print()
+#     final = add_loan_to_income_and_age_groups(cleaned)
+#     print()
+#     split_70_15_15(final)
