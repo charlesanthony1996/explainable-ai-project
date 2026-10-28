@@ -66,6 +66,12 @@ from explainable_ai_project.extract_clean import extract_and_clean_text
 # chunking
 from explainable_ai_project.chunk import chunk_documents
 
+# embedding the chunks
+from explainable_ai_project.embed import embed_chunks
+
+# build faiss index
+from explainable_ai_project.faiss_indexing import build_faiss_index
+
 def main():
 
     loaded_datasets = load_both_raw_datasets()
@@ -133,6 +139,10 @@ def main():
     extract_and_clean_text()
 
     chunk_documents()
+
+    embed_chunks()
+
+    build_faiss_index()
 
 
 

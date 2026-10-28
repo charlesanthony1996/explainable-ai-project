@@ -1,6 +1,6 @@
 # Model card: loan maximum-amount assistant
 
-Numbers filled in automatically on 2026-10-28 09:24. The team's text comes from `docs/model_card_notes.md`.
+Numbers filled in automatically on 2026-10-28 09:35. The team's text comes from `docs/model_card_notes.md`.
 
 ## Model details
 
@@ -72,7 +72,7 @@ Every model scored once on the test part (step 21). The final model is random_fo
 
 | date | dataset | training_rows_before | training_rows_after | old_model_md5 | new_model_md5 | validation_auc_before | validation_auc_after | mean_prediction_change | largest_prediction_change | removed_applicant_p_before | removed_applicant_p_after |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-10-28 09:24 | dataset_1 | 36400 | 36399 | 22710bcb33fff269f83d4029ce1e89c5 | 19f597203e2c98c0987d1c7f3565860a | 0.817 | 0.8173 | 0.00644 | 0.04858 | 0.2229 | 0.2266 |
+| 2026-10-28 09:35 | dataset_1 | 36400 | 36399 | 22710bcb33fff269f83d4029ce1e89c5 | 19f597203e2c98c0987d1c7f3565860a | 0.817 | 0.8173 | 0.00644 | 0.04858 | 0.2229 | 0.2266 |
 
 ---
 
