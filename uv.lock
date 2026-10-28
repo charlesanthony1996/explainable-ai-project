@@ -654,6 +654,7 @@ name = "explainable-ai-project"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "fairlearn" },
     { name = "interpret" },
     { name = "matplotlib" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -667,6 +668,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "fairlearn", specifier = ">=0.15.0" },
     { name = "interpret", specifier = ">=0.7.8" },
     { name = "matplotlib", specifier = ">=3.11.2" },
     { name = "numpy", specifier = ">=2.4.6" },
@@ -675,6 +677,24 @@ requires-dist = [
     { name = "scikit-learn", specifier = ">=1.9.1" },
     { name = "torch", specifier = ">=2.14.1" },
     { name = "torchvision", specifier = ">=0.29.1" },
+]
+
+[[package]]
+name = "fairlearn"
+version = "0.15.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "narwhals" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "pandas" },
+    { name = "scikit-learn" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4e/f8/d1ef45777b36ff973bfc06bd33a30c568a6275466193f2a121919dd82106/fairlearn-0.15.0.tar.gz", hash = "sha256:dfdfbddc3b86d2a8e4e04e282bb29d7603f28559a28abeca97847bf5e0f79f80", size = 109889, upload-time = "2026-10-12T05:10:18.738Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/88/9d/e96346594f66e8933181b286cdf8b495bd71998ccbc7ae3ee5e33efa0cde/fairlearn-0.15.0-py3-none-any.whl", hash = "sha256:4f4656c25af384fc3369db719231680c4e83beb2e6e075e5dc3c2b27d06455c9", size = 141365, upload-time = "2026-10-12T05:10:17.692Z" },
 ]
 
 [[package]]

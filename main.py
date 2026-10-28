@@ -33,6 +33,16 @@ from explainable_ai_project.recheck_monotonic import recheck_monotonicity
 
 # test once and metrics
 from explainable_ai_project.testing_once import test_once
+from explainable_ai_project.test_set_sweep import sweep_on_test_set
+
+# save, log and generate model card
+from explainable_ai_project.model_card import save_log_and_write_model_card
+
+# approval rates by age group
+from explainable_ai_project.age_approval import approval_rates_by_age_group
+
+# maximum amount by age group
+from explainable_ai_project.maximum_age_fairness import maximum_amount_by_age_group
 
 def main():
 
@@ -79,6 +89,14 @@ def main():
     recheck_monotonicity()
 
     test_once()
+
+    sweep_on_test_set()
+
+    save_log_and_write_model_card()
+
+    approval_rates_by_age_group()
+
+    maximum_amount_by_age_group()
 
 
 
