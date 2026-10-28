@@ -22,7 +22,9 @@ from explainable_ai_project.logistic_baseline import train_logistic_baselines
 from explainable_ai_project.sweep_problem import show_sweep_problem
 
 # random forest A
-from explainable_ai_project.montonic_forest_a import train_monotonic_forest_a
+from explainable_ai_project.monotonic_forest_a import train_monotonic_forest_a
+from explainable_ai_project.tune_forest import tune_and_retrain_a
+from explainable_ai_project.monotonic_forest_b import train_monotonic_forest_b
 
 def main():
 
@@ -57,6 +59,10 @@ def main():
     show_sweep_problem()
 
     train_monotonic_forest_a()
+
+    tune_and_retrain_a()
+
+    train_monotonic_forest_b()
 
 
 
