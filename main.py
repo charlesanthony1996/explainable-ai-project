@@ -21,6 +21,9 @@ from explainable_ai_project.load_split import check_all_splits_load
 from explainable_ai_project.logistic_baseline import train_logistic_baselines
 from explainable_ai_project.sweep_problem import show_sweep_problem
 
+# random forest A
+from explainable_ai_project.montonic_forest_a import train_monotonic_forest_a
+
 def main():
 
     loaded_datasets = load_both_raw_datasets()
@@ -52,6 +55,8 @@ def main():
 
     # from sweep_problem.py
     show_sweep_problem()
+
+    train_monotonic_forest_a()
 
 
 
