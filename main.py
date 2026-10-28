@@ -21,10 +21,15 @@ from explainable_ai_project.load_split import check_all_splits_load
 from explainable_ai_project.logistic_baseline import train_logistic_baselines
 from explainable_ai_project.sweep_problem import show_sweep_problem
 
-# random forest A
+# random forest A, tuning and running the second random forest b
 from explainable_ai_project.monotonic_forest_a import train_monotonic_forest_a
 from explainable_ai_project.tune_forest import tune_and_retrain_a
 from explainable_ai_project.monotonic_forest_b import train_monotonic_forest_b
+
+# ebm comparison
+from explainable_ai_project.ebm_comparison import run_ebm_comparison
+from explainable_ai_project.calibrate import calibrate_models
+from explainable_ai_project.recheck_monotonic import recheck_monotonicity
 
 def main():
 
@@ -63,6 +68,14 @@ def main():
     tune_and_retrain_a()
 
     train_monotonic_forest_b()
+
+    run_ebm_comparison()
+
+    calibrate_models()
+
+    recheck_monotonicity()
+
+
 
 
 
