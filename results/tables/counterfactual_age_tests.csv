@@ -1,0 +1,7 @@
+outcome,configuration,pairs,b_only_for_67,c_only_for_30,discordant_pairs,p_value_exact,verdict
+answer brings up age,A,24,5,1,6,0.219,not significant at 0.05
+answer is discouraging,A,24,2,2,4,1.0,not significant at 0.05
+answer brings up age,B,24,5,1,6,0.219,not significant at 0.05
+answer is discouraging,B,24,3,4,7,1.0,not significant at 0.05
+answer brings up age,C,24,5,0,5,0.0625,not significant at 0.05
+answer is discouraging,C,24,1,1,2,1.0,not significant at 0.05

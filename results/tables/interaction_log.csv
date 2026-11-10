@@ -26,3 +26,16 @@ The model from dataset 1 suggests that the highest loan amount for which the pro
 The reason the loan amount is not higher is due to several factors, including your loan-to-income ratio and credit score. Your loan-to-income ratio (0.3472) is relatively high, which makes approval less likely. However, your credit score (701) is quite good, contributing positively to the approval probability. The model also considers your age (34), which falls within the ""31-45"" age group, where the estimated maximum loan amount is lower compared to other age groups.
 
 It's important to note that this is an estimate based on past decisions and not a definitive offer. A human reviewer may still consider other factors not captured in the model, such as your employment stability, debt-to-income ratio, and other financial obligations. Therefore, while 28,429 is the highest amount the model suggests you could get with an 80% approval probability, the actual maximum may be higher, but the data does not provide this information."
+2026-11-10 15:32:50,C,v1,"What is the largest loan I could get, and why is it not more?",qwen2.5:7b-instruct,42,0.0,7.72,427,28429.0,True,False,,14,12,0.8571,"0.3, 42093.0",False,,,"Based on the information provided in the contract, the largest loan amount you could likely get, according to the model from dataset 1, is 28,429. This estimate is derived from the ""max_amount_0.8"" value, which is the highest loan amount for which the model's calibrated probability of approval (P(approve)) is still at least 0.8.
+
+The reason it is not higher is due to several factors:
+
+1. **Credit Score**: Your credit score of 701 contributes positively to the approval probability, as indicated by its contribution of 0.16671 in the top features. However, it is not the highest possible score, which could allow for a slightly higher loan amount.
+
+2. **Loan-to-Income Ratio**: The loan-to-income ratio (0.3472) is relatively high, meaning the loan amount is a significant portion of your annual income. This ratio is set at 0.3, and any higher value makes approval less likely, as shown by the negative contribution of -0.05946.
+
+3. **Age Group**: You fall into the ""31-45"" age group, which has an estimated maximum loan amount of 42,093 based on dataset 2. However, the model from dataset 1, which is the one used here, sets a lower maximum due to the specific characteristics of this dataset.
+
+4. **Upper Limit Flag**: The ""max_is_upper_limit"" flag is true, indicating that the estimated maximum amount of 28,429 is the highest amount the system was allowed to check. This means the real maximum could potentially be higher, but the data does not show it.
+
+In summary, the largest loan amount you could likely get is 28,429, as this is the highest amount for which the model predicts an 80% or higher approval probability. The factors contributing to this limit include your credit score, loan-to-income ratio, and the characteristics of the dataset used for the model."

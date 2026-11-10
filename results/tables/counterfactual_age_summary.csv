@@ -1,0 +1,4 @@
+configuration,pairs,numbers_identical,share_numbers_identical,age_mentioned_young,age_mentioned_old,age_only_for_old,age_only_for_young,discouraging_young,discouraging_old,human_review_young,human_review_old,mean_words_young,mean_words_old,mean_text_overlap,all_results_held_fixed
+A,24,4,0.1667,1,5,5,1,5,5,13,12,241.3,252.0,0.4584,True
+B,24,6,0.25,2,6,5,1,5,4,14,18,246.8,261.5,0.4994,True
+C,24,1,0.0417,4,9,5,0,3,3,19,16,285.0,272.2,0.5103,True

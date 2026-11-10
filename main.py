@@ -17,6 +17,11 @@ Usage
                                one checked answer (needs Ollama running)
     uv run main.py evaluate    evaluation pathway: 24 questions through the
                                three configurations, with the paired tests
+    uv run main.py counterfactual
+                               Topic 3, check 9: the same applicant labelled
+                               30 and 67, with every computed result held
+                               fixed, so a difference can only come from the
+                               language model
 
 Each training block reads what it needs from disk and writes its own outputs, so
 the blocks can be run one at a time. Running `data` once is enough; after that
@@ -184,6 +189,15 @@ def stage_evaluate(reuse_answers=False):
     return run_evaluation(reuse_answers=reuse_answers)
 
 
+# ------------------------------------------------------------------
+# Topic 3 after the LLM, check 9: counterfactual age pairs
+# ------------------------------------------------------------------
+def stage_counterfactual():
+    from explainable_ai_project.counterfactual_age import run_counterfactual_age
+
+    return run_counterfactual_age()
+
+
 STAGES = {
     "data": stage_data,
     "models": stage_models,
@@ -195,6 +209,7 @@ STAGES = {
     "train": stage_train,
     "ask": stage_ask,
     "evaluate": stage_evaluate,
+    "counterfactual": stage_counterfactual,
 }
 
 
