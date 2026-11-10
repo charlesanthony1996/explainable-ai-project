@@ -150,6 +150,15 @@ def stage_shap():
 
 
 # ------------------------------------------------------------------
+# The two overview diagrams (no models needed, drawn from constants)
+# ------------------------------------------------------------------
+def stage_overview():
+    from explainable_ai_project.overview_figure import make_overview_figures
+
+    return make_overview_figures()
+
+
+# ------------------------------------------------------------------
 # Whole training pathway
 # ------------------------------------------------------------------
 def stage_train():
@@ -182,6 +191,7 @@ STAGES = {
     "shap": stage_shap,
     "rag": stage_rag,
     "retrieval_check": stage_retrieval_check,
+    "overview": stage_overview,
     "train": stage_train,
     "ask": stage_ask,
     "evaluate": stage_evaluate,

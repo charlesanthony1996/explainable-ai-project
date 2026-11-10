@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(uv run main.py data)",
+      "Bash(uv run main.py models)",
+      "Bash(uv run main.py fairness)",
+      "Bash(uv run main.py shap)",
+      "Bash(uv run main.py rag)",
+      "Bash(uv run main.py retrieval_check)",
+      "Bash(uv run main.py train)",
+      "Bash(uv run main.py ask)",
+      "Bash(uv run main.py evaluate)",
+      "Bash(uv run main.py evaluate --reuse-answers)",
+      "Bash(uv run main.py overview)",
+      "Bash(uv run main.py --help)",
+      "Bash(uv --version)",
+      "Bash(uv lock --check)",
+      "Bash(ollama ps)",
+      "Bash(ollama list)",
+      "Bash(curl -s http://127.0.0.1:11434/api/tags)"
+    ]
+  }
+}
