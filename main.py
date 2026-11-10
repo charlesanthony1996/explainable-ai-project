@@ -154,5 +154,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "ask":
         from explainable_ai_project.assistant import run_from_command_line
         run_from_command_line(sys.argv[2:])
+    elif len(sys.argv) > 1 and sys.argv[1] == "evaluate":
+        # uv run main.py evaluate ...   -> the evaluation pathway
+        from explainable_ai_project.evaluation import run_from_command_line as run_evaluation
+        run_evaluation(sys.argv[2:])
     else:
         main()

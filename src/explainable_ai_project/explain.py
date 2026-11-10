@@ -181,3 +181,79 @@ def shap_explanation(rows, model_name=PRIMARY_MODEL):
         "base_value": round(base_value, 4),
         "top_features": top_features,
     }
+
+
+# ==================================================================
+# LIME (evaluation step 8: SHAP vs LIME)
+# ==================================================================
+# LIME explains ONE prediction by trying many small random changes to the
+# applicant, watching how P(approve) moves, and fitting a simple weighted linear
+# model to those points. Its "score" is the R2 of that linear model: how
+# faithfully the simple model copies the Random Forest near this applicant.
+# Because the changes are random, two runs can give different top features;
+# step 8 measures that (stability).
+
+LIME_BACKGROUND_ROWS = 2000
+_lime_parts = {}
+
+
+def lime_parts(model_name=PRIMARY_MODEL):
+    """The LIME explainer setup for model A or B (made once)."""
+
+    if model_name not in _lime_parts:
+        from explainable_ai_project.load_split import load_split
+
+        parts = load_model_parts(model_name)
+        train_features = load_split(parts["dataset"], "train")["features"]
+        background = train_features.sample(min(LIME_BACKGROUND_ROWS, len(train_features)), random_state=42)
+
+        feature_names = parts["feature_names"]
+        category_positions = [position for position, name in enumerate(feature_names)
+                              if original_field(name) != name]
+
+        def predict(values):
+            # LIME passes plain arrays; the model was fitted with named columns
+            import pandas as pd
+            frame = pd.DataFrame(values, columns=feature_names)
+            return parts["model"].predict_proba(frame)
+
+        _lime_parts[model_name] = {
+            "background": background.to_numpy(dtype=float),
+            "feature_names": feature_names,
+            "category_positions": category_positions,
+            "predict": predict,
+        }
+    return _lime_parts[model_name]
+
+
+def lime_explanation(rows, seed, model_name=PRIMARY_MODEL):
+    """One LIME run for ONE applicant. Explains the CALIBRATED model's P(approve).
+
+    Returns ({field: weight} with one-hot columns added back together, fidelity R2).
+    """
+    from lime.lime_tabular import LimeTabularExplainer
+
+    setup = lime_parts(model_name)
+    parts = load_model_parts(model_name)
+    features = make_features(rows, parts["preprocessor"], parts["feature_names"])
+
+    explainer = LimeTabularExplainer(
+        setup["background"],
+        feature_names=setup["feature_names"],
+        categorical_features=setup["category_positions"],
+        class_names=["rejected", "approved"],
+        mode="classification",
+        random_state=seed,
+    )
+    explanation = explainer.explain_instance(
+        features.iloc[0].to_numpy(dtype=float),
+        setup["predict"],
+        num_features=len(setup["feature_names"]),
+        labels=(1,),
+    )
+
+    totals = {}
+    for position, weight in explanation.as_map()[1]:
+        field = original_field(setup["feature_names"][position])
+        totals[field] = totals.get(field, 0.0) + float(weight)
+    return totals, float(explanation.score)
