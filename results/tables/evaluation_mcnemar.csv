@@ -1,0 +1,15 @@
+outcome,comparison,questions,pairs,both_right,both_wrong,b_first_wrong_second_right,c_first_right_second_wrong,discordant_pairs,p_value_exact,verdict
+numbers_ok,A vs C,both stated a figure,12,5,1,2,4,6,0.688,not significant at 0.05
+numbers_ok,A vs B,both stated a figure,11,7,0,3,1,4,0.625,not significant at 0.05
+numbers_ok,B vs C,both stated a figure,15,7,2,0,6,6,0.0312,significant at 0.05
+numbers_ok,A vs C,all,24,12,1,2,9,11,0.0654,not significant at 0.05
+numbers_ok,B vs C,all,24,14,2,0,8,8,0.00781,significant at 0.05
+numbers_grounded_ok,A vs C,both stated a figure,12,9,1,2,0,2,0.5,not significant at 0.05
+numbers_grounded_ok,A vs B,both stated a figure,11,7,0,3,1,4,0.625,not significant at 0.05
+numbers_grounded_ok,B vs C,both stated a figure,15,12,0,2,1,3,1.0,not significant at 0.05
+cites_a_retrieved_source,A vs C,source-requiring,15,0,0,15,0,15,6.1e-05,significant at 0.05
+cites_a_retrieved_source,B vs C,source-requiring,15,0,0,15,0,15,6.1e-05,significant at 0.05
+no_fabricated_citation,A vs C,all,24,0,0,24,0,24,1.19e-07,significant at 0.05
+no_fabricated_citation,B vs C,all,24,0,0,24,0,24,1.19e-07,significant at 0.05
+deferral_ok,A vs C,flagged cases,7,1,2,4,0,4,0.125,not significant at 0.05
+deferral_ok,A vs B,flagged cases,7,1,2,4,0,4,0.125,not significant at 0.05

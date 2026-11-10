@@ -100,9 +100,36 @@ Write in plain language, in short paragraphs. Do not use jargon without
 explaining it."""
 
 
+# v2 differs from v1 in rule 2 only. v1 states the principle ("cite the source
+# it came from"), which qwen2.5:7b-instruct reproducibly ignored: across every
+# run of `ask` it produced no bracket marker at all. Rule 2 below instead says
+# where a marker has to go and what it looks like. Keeping v1 in the file is
+# deliberate: the comparison v1 -> v2 is itself a result for the report, namely
+# that an instruction has to be operationalised, not merely stated.
+
+SYSTEM_PROMPT_V2 = SYSTEM_PROMPT_V1.replace(
+    """2. SOURCES. When you state anything about regulation, lender obligations or the
+   model's own fairness, cite the source it came from, using the bracket marker
+   of the retrieved passage, for example [2]. Do not cite a passage that was not
+   given to you.""",
+    """2. SOURCES. End every paragraph that says something about regulation, about
+   what a lender must do, or about the fairness of the model, with the bracket
+   marker of the passage it came from, like this: [2]. Put the marker after the
+   final full stop of that paragraph. Use only markers that were given to you in
+   the SUPPORTING PASSAGES section. If a paragraph says nothing of that kind, do
+   not put a marker on it.""",
+)
+
+if SYSTEM_PROMPT_V2 == SYSTEM_PROMPT_V1:      # the replace found nothing
+    raise RuntimeError("SYSTEM_PROMPT_V2: rule 2 of v1 was not found - "
+                       "the two prompts would be identical and the "
+                       "v1 vs v2 comparison would be meaningless")
+
+
 SYSTEM_PROMPTS = {
     "v0": SYSTEM_PROMPT_V0,
     "v1": SYSTEM_PROMPT_V1,
+    "v2": SYSTEM_PROMPT_V2,
 }
 
 

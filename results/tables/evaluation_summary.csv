@@ -1,0 +1,4 @@
+configuration,answers,answers_stating_a_number,answers_with_all_numbers_supported,share_answers_fully_supported,share_fully_supported_when_committed,share_nothing_invented_when_committed,numbers_checked_total,numbers_supported_total,share_numbers_supported,answers_with_no_invented_number,share_answers_nothing_invented,share_numbers_grounded,answers_citing_a_source,source_questions,source_questions_citing,fabricated_citations,flagged_answers,flagged_mentioning_human_review,not_flagged_offering_human_review,mean_seconds,mean_tokens
+A,24,13,21,0.875,0.7692,0.7692,39,34,0.8718,21,0.875,0.8718,0,15,0,24,7,1,4,2.06,128.4
+B,24,17,22,0.9167,0.8824,0.8824,52,49,0.9423,22,0.9167,0.9423,0,15,0,24,7,5,6,2.83,163.3
+C,24,18,14,0.5833,0.4444,0.9444,131,73,0.5573,23,0.9583,0.9771,24,15,15,0,7,5,4,4.46,259.8

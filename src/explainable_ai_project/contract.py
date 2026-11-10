@@ -306,8 +306,18 @@ def numbers_in(text):
 
 
 def check_numbers(text, contract, relative_tolerance=0.01,
-                  absolute_tolerance=0.005, ignore_small_integers=True):
+                  absolute_tolerance=0.005, ignore_small_integers=True,
+                  extra_allowed=None):
     """Does every number in the answer come from the contract?
+
+    extra_allowed widens the yardstick with numbers that are legitimate but do
+    not belong to the contract. The retrieved passages are the case this exists
+    for: an answer that quotes a figure out of the fairness report is doing the
+    right thing, yet that figure is not in the contract and would otherwise be
+    counted as invented. Passing the passage numbers in turns this into a test
+    of whether the answer stayed inside the material it was shown, which is a
+    different question from whether its figures match the contract. Run it both
+    ways and report both; do not quietly replace one with the other.
 
     Returns:
         numbers_checked     how many numbers were tested
@@ -317,7 +327,9 @@ def check_numbers(text, contract, relative_tolerance=0.01,
         passed              True if nothing was unsupported
     """
 
-    permitted = contract.get("allowed_numbers", [])
+    permitted = list(contract.get("allowed_numbers", []))
+    if extra_allowed:
+        permitted = permitted + [float(value) for value in extra_allowed]
     said = numbers_in(text)
 
     checked = []

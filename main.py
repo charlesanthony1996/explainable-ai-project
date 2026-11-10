@@ -15,7 +15,8 @@ Usage
 
     uv run main.py ask         inference pathway: one applicant, one question,
                                one checked answer (needs Ollama running)
-    uv run main.py evaluate    evaluation pathway, A / B / C runs    (to build)
+    uv run main.py evaluate    evaluation pathway: 24 questions through the
+                               three configurations, with the paired tests
 
 Each training block reads what it needs from disk and writes its own outputs, so
 the blocks can be run one at a time. Running `data` once is enough; after that
@@ -160,7 +161,7 @@ def stage_train():
 
 
 # ------------------------------------------------------------------
-# Not built yet
+# Inference and evaluation (both need Ollama)
 # ------------------------------------------------------------------
 def stage_ask():
     from explainable_ai_project.assistant import run_ask
@@ -168,10 +169,10 @@ def stage_ask():
     run_ask()
 
 
-def stage_evaluate():
-    print("The evaluation pathway is not built yet.")
-    print("Still missing: evaluation.py, the test questions and the rubric")
-    return 1
+def stage_evaluate(reuse_answers=False):
+    from explainable_ai_project.evaluation import run_evaluation
+
+    return run_evaluation(reuse_answers=reuse_answers)
 
 
 STAGES = {
@@ -198,17 +199,29 @@ def main():
         choices=sorted(STAGES),
         help="which block to run",
     )
+    parser.add_argument(
+        "--reuse-answers",
+        action="store_true",
+        help="evaluate only: redo the analysis on the answers already "
+             "generated, without asking the model anything again",
+    )
     arguments = parser.parse_args()
 
     stage_name = arguments.stage
     stage_function = STAGES[stage_name]
+
+    if arguments.reuse_answers and stage_name != "evaluate":
+        parser.error("--reuse-answers only applies to the evaluate stage")
 
     print("=" * 70)
     print("running:", stage_name)
     print("=" * 70)
 
     started_at = time.time()
-    exit_code = stage_function()
+    if stage_name == "evaluate":
+        exit_code = stage_function(reuse_answers=arguments.reuse_answers)
+    else:
+        exit_code = stage_function()
     seconds = round(time.time() - started_at, 1)
 
     print()
