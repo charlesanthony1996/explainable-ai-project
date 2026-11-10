@@ -1,0 +1,15 @@
+column,correlation_with_amount,r2_from_amount,link,model_input,action
+Annual_Income,0.849,0.797,strongly tied,True,model input: keep the sweep within realistic amounts for the applicant
+Credit_Score,0.703,0.762,strongly tied,True,model input: keep the sweep within realistic amounts for the applicant
+Age,-0.205,0.064,not tied,True,none
+Dependents,-0.007,0.0,not tied,True,none
+Monthly_Expenses,0.003,0.0,not tied,False,none
+Existing_Loans,-0.004,0.0,not tied,False,none
+Total_Existing_Loan_Amount,0.005,0.0,not tied,False,none
+Outstanding_Debt,0.002,0.0,not tied,False,none
+Loan_History,0.002,0.0,not tied,False,none
+Loan_Term,0.005,0.0,not tied,True,none
+Interest_Rate,0.004,0.0,not tied,False,none
+Bank_Account_History,-0.001,0.0,not tied,False,none
+Transaction_Frequency,0.002,0.0,not tied,False,none
+Default_Risk,0.001,0.0,not tied,False,none

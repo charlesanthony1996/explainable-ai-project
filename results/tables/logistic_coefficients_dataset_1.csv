@@ -1,0 +1,21 @@
+feature,coefficient,size,direction
+credit_score,1.2389,1.2389,raises approval
+annual_income,0.4013,0.4013,raises approval
+loan_to_income,0.1427,0.1427,raises approval
+age,-0.0588,0.0588,lowers approval
+loan_amount,0.0537,0.0537,raises approval
+marital_status_Divorced,-0.0208,0.0208,lowers approval
+employment_status_Unemployed,-0.0161,0.0161,lowers approval
+marital_status_Married,0.0139,0.0139,raises approval
+dependents,0.0136,0.0136,raises approval
+loan_purpose_Vehicle,0.0116,0.0116,raises approval
+education_High School,0.0112,0.0112,raises approval
+loan_purpose_Home,-0.0112,0.0112,lowers approval
+employment_status_Employed,0.0107,0.0107,raises approval
+education_Postgraduate,-0.0079,0.0079,lowers approval
+education_Undergraduate,-0.0047,0.0047,lowers approval
+employment_status_Self-Employed,0.0024,0.0024,raises approval
+marital_status_Single,-0.0014,0.0014,lowers approval
+loan_term_months,-0.0013,0.0013,lowers approval
+loan_purpose_Personal or other,0.0011,0.0011,raises approval
+loan_purpose_Education,0.001,0.001,raises approval

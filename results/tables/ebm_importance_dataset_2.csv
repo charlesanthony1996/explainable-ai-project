@@ -1,0 +1,12 @@
+feature,importance
+loan_to_income,1.3926
+annual_income,1.0942
+loan_term_months,0.3798
+loan_amount,0.3668
+education,0.3433
+age,0.2262
+credit_score,0.173
+employment_status,0.1141
+marital_status,0.0298
+loan_purpose,0.0155
+dependents,0.0097

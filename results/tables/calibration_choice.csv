@@ -1,0 +1,5 @@
+dataset,method,brier_raw,brier_calibrated_out_of_fold,chosen
+dataset_1,sigmoid,0.1289,0.1282,False
+dataset_1,isotonic,0.1289,0.1279,True
+dataset_2,sigmoid,0.0824,0.0801,False
+dataset_2,isotonic,0.0824,0.0791,True

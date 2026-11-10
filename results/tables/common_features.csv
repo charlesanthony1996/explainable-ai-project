@@ -1,0 +1,12 @@
+shared_name,dataset_1_column,dataset_2_column,dataset_1_kind,dataset_2_kind,same_kind
+age,Age,Age,number,number,True
+marital_status,Marital_Status,MaritalStatus,text,text,True
+dependents,Dependents,NumberOfDependents,number,number,True
+education,Education,EducationLevel,text,text,True
+employment_status,Employment_Status,EmploymentStatus,text,text,True
+annual_income,Annual_Income,AnnualIncome,number,number,True
+credit_score,Credit_Score,CreditScore,number,number,True
+loan_amount,Loan_Amount_Requested,LoanAmount,number,number,True
+loan_term_months,Loan_Term,LoanDuration,number,number,True
+loan_purpose,Loan_Purpose,LoanPurpose,text,text,True
+approved,Loan_Approval_Status,LoanApproved,number,number,True

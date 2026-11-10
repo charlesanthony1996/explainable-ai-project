@@ -1,0 +1,33 @@
+dataset,adjustment,age_group,share_getting_an_amount,gap_between_groups
+dataset_1,not adjusted,18-30,0.693,0.834
+dataset_1,not adjusted,31-45,0.834,0.834
+dataset_1,not adjusted,46-60,0.568,0.834
+dataset_1,not adjusted,61+,0.0,0.834
+dataset_1,same income mix,18-30,0.703,0.761
+dataset_1,same income mix,31-45,0.761,0.761
+dataset_1,same income mix,46-60,0.654,0.761
+dataset_1,same income mix,61+,0.0,0.761
+dataset_1,same credit score mix,18-30,0.702,0.739
+dataset_1,same credit score mix,31-45,0.739,0.739
+dataset_1,same credit score mix,46-60,0.674,0.739
+dataset_1,same credit score mix,61+,0.0,0.739
+dataset_1,same income and credit score mix,18-30,0.709,0.715
+dataset_1,same income and credit score mix,31-45,0.715,0.715
+dataset_1,same income and credit score mix,46-60,0.695,0.715
+dataset_1,same income and credit score mix,61+,0.0,0.715
+dataset_2,not adjusted,18-30,0.151,0.257
+dataset_2,not adjusted,31-45,0.278,0.257
+dataset_2,not adjusted,46-60,0.379,0.257
+dataset_2,not adjusted,61+,0.408,0.257
+dataset_2,same income mix,18-30,0.216,0.099
+dataset_2,same income mix,31-45,0.285,0.099
+dataset_2,same income mix,46-60,0.315,0.099
+dataset_2,same income mix,61+,0.299,0.099
+dataset_2,same credit score mix,18-30,0.182,0.338
+dataset_2,same credit score mix,31-45,0.287,0.338
+dataset_2,same credit score mix,46-60,0.363,0.338
+dataset_2,same credit score mix,61+,0.52,0.338
+dataset_2,same income and credit score mix,18-30,0.222,0.129
+dataset_2,same income and credit score mix,31-45,0.291,0.129
+dataset_2,same income and credit score mix,46-60,0.307,0.129
+dataset_2,same income and credit score mix,61+,0.351,0.129

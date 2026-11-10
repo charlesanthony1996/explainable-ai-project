@@ -1,0 +1,22 @@
+dataset,feature,mean_absolute_contribution,mean_signed_contribution,usually_pushes,rank
+dataset_2,loan_to_income,0.11641,-0.00115,down,1
+dataset_2,annual_income,0.08816,-0.00182,down,2
+dataset_2,loan_amount,0.0516,0.00077,up,3
+dataset_2,education_Postgraduate,0.01584,0.00029,up,4
+dataset_2,education_High School,0.01473,0.00049,up,5
+dataset_2,loan_term_months,0.0131,-0.00043,down,6
+dataset_2,age,0.01257,-0.00015,down,7
+dataset_2,credit_score,0.01156,-4e-05,down,8
+dataset_2,employment_status_Unemployed,0.00174,5e-05,up,9
+dataset_2,education_Undergraduate,0.00151,9e-05,up,10
+dataset_2,dependents,0.00135,4e-05,up,11
+dataset_2,employment_status_Employed,0.0009,-0.0,up,12
+dataset_2,loan_purpose_Education,0.00077,-6e-05,down,13
+dataset_2,marital_status_Single,0.00065,0.0,up,14
+dataset_2,loan_purpose_Home,0.00063,6e-05,up,15
+dataset_2,employment_status_Self-Employed,0.00057,-2e-05,down,16
+dataset_2,marital_status_Divorced,0.00054,-0.0,up,17
+dataset_2,loan_purpose_Personal or other,0.00054,1e-05,up,18
+dataset_2,marital_status_Married,0.0005,4e-05,up,19
+dataset_2,loan_purpose_Vehicle,0.00045,-2e-05,down,20
+dataset_2,marital_status_Other,0.00035,0.0,up,21

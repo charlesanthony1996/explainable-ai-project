@@ -1,0 +1,7 @@
+dataset,threshold,share_with_no_amount,share_of_maximums_at_upper_limit,median_max_amount,median_requested_amount,consistency
+dataset_1,0.7,0.2942,,39766.0,21071.0,0.844
+dataset_1,0.8,0.2944,0.0336,31950.0,21071.0,0.8305
+dataset_1,0.9,0.7427,,18984.0,21071.0,0.3583
+dataset_2,0.7,0.4583,,13066.0,22046.0,0.8633
+dataset_2,0.8,0.7183,0.0,15353.0,22046.0,0.8253
+dataset_2,0.9,0.7667,,15196.0,22046.0,0.8117

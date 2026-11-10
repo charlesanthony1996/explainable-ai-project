@@ -1,0 +1,9 @@
+dataset,model,auc,f1,brier,explainability
+dataset_1,logistic_regression,0.8214,0.8874,0.1341,"glass box: one weight per feature, straight-line effects only"
+dataset_1,ebm_monotonic,0.8179,0.888,0.1278,"glass box: one curve per feature, follows the amount rule"
+dataset_1,random_forest_monotonic,0.817,0.888,0.1289,black box: needs SHAP; follows the amount rule
+dataset_1,random_forest_unconstrained,0.8156,0.888,0.1285,black box: needs SHAP; can break the amount rule
+dataset_2,ebm_monotonic,0.9481,0.7703,0.074,"glass box: one curve per feature, follows the amount rule"
+dataset_2,logistic_regression,0.9474,0.7599,0.0753,"glass box: one weight per feature, straight-line effects only"
+dataset_2,random_forest_unconstrained,0.9444,0.767,0.0775,black box: needs SHAP; can break the amount rule
+dataset_2,random_forest_monotonic,0.9423,0.741,0.0824,black box: needs SHAP; follows the amount rule

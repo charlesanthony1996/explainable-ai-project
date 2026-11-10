@@ -1,0 +1,5 @@
+dataset,version,auc,f1,brier,demographic_parity_ratio_at_0.5,equal_opportunity_difference_at_0.5
+dataset_1,with age,0.8175,0.8864,0.1298,0.0,0.966
+dataset_1,without age,0.8143,0.8864,0.1299,0.0,0.966
+dataset_2,with age,0.9274,0.7382,0.0888,0.423,0.116
+dataset_2,without age,0.9253,0.7375,0.0891,0.511,0.102

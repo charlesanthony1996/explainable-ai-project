@@ -1,0 +1,7 @@
+dataset,split,rows,approval_rate
+dataset_1,train,36400,0.642
+dataset_1,validation,7800,0.642
+dataset_1,test,7800,0.642
+dataset_2,train,14000,0.239
+dataset_2,validation,3000,0.239
+dataset_2,test,3000,0.239

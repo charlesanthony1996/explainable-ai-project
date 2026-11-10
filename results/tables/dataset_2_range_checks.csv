@@ -1,0 +1,8 @@
+column,allowed_min,allowed_max,actual_min,actual_max,rows_outside
+age,18,100,18,80,0
+dependents,0,20,0,5,0
+annual_income,1,no limit,15000,485341,0
+credit_score,300,850,343,712,0
+loan_amount,1,no limit,3674,184732,0
+loan_term_months,1,480,12,120,0
+approved,0,1,0,1,0

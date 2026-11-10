@@ -1,0 +1,13 @@
+dataset,rule,switched_on,share_of_applicants
+dataset_1,borderline,True,0.0106
+dataset_1,unusual_input,True,0.0788
+dataset_1,missing_data,True,0.0
+dataset_1,disagreement,False,0.2917
+dataset_1,weak_group,True,0.05
+dataset_1,deferred (any switched-on rule),True,0.1277
+dataset_2,borderline,True,0.0637
+dataset_2,unusual_input,True,0.0527
+dataset_2,missing_data,True,0.0
+dataset_2,disagreement,False,0.0293
+dataset_2,weak_group,True,0.0
+dataset_2,deferred (any switched-on rule),True,0.1103

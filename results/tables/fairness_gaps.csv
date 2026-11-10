@@ -1,0 +1,5 @@
+dataset,cut_off,demographic_parity_difference,demographic_parity_ratio,equal_opportunity_difference,predictive_parity_difference,most_approved_group,least_approved_group
+dataset_1,0.5,0.834,0.0,0.966,0.847,31-45,61+
+dataset_1,0.8,0.824,0.0,0.956,0.848,31-45,61+
+dataset_2,0.5,0.202,0.423,0.116,0.127,61+,18-30
+dataset_2,0.8,0.067,0.444,0.06,0.139,46-60,18-30

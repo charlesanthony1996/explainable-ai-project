@@ -1,0 +1,7 @@
+column,dataset_1_min,dataset_1_median,dataset_1_max,dataset_2_min,dataset_2_median,dataset_2_max
+age,18,38.0,69,18,40.0,80
+dependents,0,1.0,3,0,1.0,5
+annual_income,20009,78839.0,149998,15000,48566.0,485341
+credit_score,300,742.0,849,343,578.0,712
+loan_amount,5000,21039.0,44848,3674,21914.5,184732
+loan_term_months,12,126.0,239,12,48.0,120

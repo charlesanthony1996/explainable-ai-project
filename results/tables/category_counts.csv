@@ -1,0 +1,28 @@
+dataset,column,label,rows
+dataset_1,marital_status,Married,25957
+dataset_1,marital_status,Single,20787
+dataset_1,marital_status,Divorced,5256
+dataset_1,education,Undergraduate,20787
+dataset_1,education,High School,20769
+dataset_1,education,Postgraduate,10444
+dataset_1,employment_status,Employed,25871
+dataset_1,employment_status,Self-Employed,15753
+dataset_1,employment_status,Unemployed,10376
+dataset_1,loan_purpose,Home,20919
+dataset_1,loan_purpose,Personal or other,10380
+dataset_1,loan_purpose,Vehicle,10357
+dataset_1,loan_purpose,Education,10344
+dataset_2,marital_status,Married,10041
+dataset_2,marital_status,Single,6078
+dataset_2,marital_status,Divorced,2882
+dataset_2,marital_status,Other,999
+dataset_2,education,Undergraduate,10088
+dataset_2,education,High School,5908
+dataset_2,education,Postgraduate,4004
+dataset_2,employment_status,Employed,17036
+dataset_2,employment_status,Self-Employed,1573
+dataset_2,employment_status,Unemployed,1391
+dataset_2,loan_purpose,Personal or other,7033
+dataset_2,loan_purpose,Home,5925
+dataset_2,loan_purpose,Vehicle,4034
+dataset_2,loan_purpose,Education,3008

@@ -1,0 +1,21 @@
+dataset,feature,mean_absolute_contribution,mean_signed_contribution,usually_pushes,rank
+dataset_1,credit_score,0.20999,0.00635,up,1
+dataset_1,annual_income,0.06506,-0.01053,down,2
+dataset_1,loan_to_income,0.02101,-0.00056,down,3
+dataset_1,age,0.01575,0.00516,up,4
+dataset_1,loan_amount,0.01068,-0.00168,down,5
+dataset_1,loan_term_months,0.0036,-1e-05,down,6
+dataset_1,dependents,0.00186,-5e-05,down,7
+dataset_1,marital_status_Married,0.00103,-4e-05,down,8
+dataset_1,education_High School,0.00095,-2e-05,down,9
+dataset_1,marital_status_Divorced,0.00091,0.00016,up,10
+dataset_1,loan_purpose_Home,0.00077,2e-05,up,11
+dataset_1,loan_purpose_Vehicle,0.00075,-6e-05,down,12
+dataset_1,employment_status_Unemployed,0.00066,-3e-05,down,13
+dataset_1,loan_purpose_Education,0.00065,5e-05,up,14
+dataset_1,education_Undergraduate,0.00064,4e-05,up,15
+dataset_1,marital_status_Single,0.00064,-0.0,up,16
+dataset_1,employment_status_Employed,0.0006,-1e-05,down,17
+dataset_1,employment_status_Self-Employed,0.00049,-2e-05,down,18
+dataset_1,education_Postgraduate,0.00047,2e-05,up,19
+dataset_1,loan_purpose_Personal or other,0.00037,-1e-05,down,20

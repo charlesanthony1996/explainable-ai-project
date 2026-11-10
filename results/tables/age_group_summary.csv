@@ -1,0 +1,9 @@
+dataset,age_group,rows,approval_rate
+dataset_1,18-30,12583,0.633
+dataset_1,31-45,26589,0.731
+dataset_1,46-60,10227,0.543
+dataset_1,61+,2601,0.153
+dataset_2,18-30,4501,0.14
+dataset_2,31-45,9313,0.244
+dataset_2,46-60,5382,0.304
+dataset_2,61+,804,0.307

@@ -1,0 +1,2 @@
+date,dataset,removed_applicant,training_rows_before,training_rows_after,old_model_md5,new_model_md5,validation_auc_before,validation_auc_after,mean_prediction_change,largest_prediction_change,removed_applicant_p_before,removed_applicant_p_after
+2026-11-09 11:03,dataset_1,D1-26978,36400,36399,22947c186386b08e0f64a33d4c8c125d,62fd488e0b5d973b9bc291127a6568d8,0.817,0.8163,0.00511,0.03321,0.2378,0.2351

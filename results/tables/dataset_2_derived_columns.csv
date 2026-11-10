@@ -1,0 +1,29 @@
+column,correlation_with_amount,r2_from_amount,link,model_input,action
+MonthlyLoanPayment,0.781,0.598,strongly tied,False,not a model input: mention in the report
+TotalDebtToIncomeRatio,0.457,0.198,partly tied,False,not a model input: mention in the report
+BaseInterestRate,0.386,0.138,partly tied,False,not a model input: mention in the report
+InterestRate,0.323,0.094,not tied,False,none
+RiskScore,0.138,0.018,not tied,False,none
+LoanDuration,-0.0,0.0,not tied,True,none
+MonthlyDebtPayments,0.021,0.0,not tied,False,none
+NumberOfDependents,-0.007,0.0,not tied,True,none
+Age,-0.007,0.0,not tied,True,none
+AnnualIncome,-0.004,0.0,not tied,True,none
+CreditScore,-0.011,0.0,not tied,True,none
+Experience,-0.008,0.0,not tied,False,none
+BankruptcyHistory,0.005,0.0,not tied,False,none
+DebtToIncomeRatio,-0.01,0.0,not tied,False,none
+NumberOfCreditInquiries,-0.006,0.0,not tied,False,none
+NumberOfOpenCreditLines,0.001,0.0,not tied,False,none
+CreditCardUtilizationRate,0.001,0.0,not tied,False,none
+PreviousLoanDefaults,-0.002,0.0,not tied,False,none
+LengthOfCreditHistory,0.001,0.0,not tied,False,none
+PaymentHistory,-0.003,0.0,not tied,False,none
+MonthlyIncome,-0.005,0.0,not tied,False,none
+TotalLiabilities,0.001,0.0,not tied,False,none
+TotalAssets,-0.004,0.0,not tied,False,none
+CheckingAccountBalance,0.005,0.0,not tied,False,none
+SavingsAccountBalance,0.001,0.0,not tied,False,none
+NetWorth,-0.004,0.0,not tied,False,none
+UtilityBillsPaymentHistory,-0.012,0.0,not tied,False,none
+JobTenure,0.005,0.0,not tied,False,none

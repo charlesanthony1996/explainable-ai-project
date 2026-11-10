@@ -13,17 +13,16 @@ wheels/
 datasets
 /datasets
 
-.results
-results
-/results
+# docs/ and results/ are tracked on purpose. They are the inputs for the
+# written report and cost hours of compute to regenerate, so they must
+# survive the loss of any single machine. Together about 2.9 MB.
+
+# models/ and rag_index/ stay out: 213 MB and 6.2 MB, and both are
+# reproducible with `uv run main.py train`.
 
 .models
 models
 /models
-
-.docs
-docs
-/docs
 
 # .rag_docs
 # rag_docs

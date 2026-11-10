@@ -1,0 +1,33 @@
+date,step,file,md5,size_kb,note
+2026-11-09 11:01,1 load,datasets\root\loan_dataset_1.csv,b14dbfd7431ea362cb5b8d02dc095dca,7432.5,"raw data, dataset_1"
+2026-11-09 11:01,1 load,datasets\root\loan_dataset_2.csv,bb8daba59a03717ee817344b829f7411,5461.7,"raw data, dataset_2"
+2026-11-09 11:01,8 add features,datasets\processed\dataset_1_clean.csv,d6e7f9e5fc23ac23352465e0159b5942,5221.5,cleaned data with loan_to_income and age_group
+2026-11-09 11:01,8 add features,datasets\processed\dataset_2_clean.csv,38e4a380c65cc2b1ad17689c4fa9c78f,1992.1,cleaned data with loan_to_income and age_group
+2026-11-09 11:01,9 split,datasets\processed\splits_dataset_1.csv,c8a1b6a7dab055ee48891ea6c9dbaee3,832.1,"train / validation / test IDs, seed 42"
+2026-11-09 11:01,9 split,datasets\processed\splits_dataset_2.csv,ddf84c37b43fe2e18e98f8b018311468,313.4,"train / validation / test IDs, seed 42"
+2026-11-09 11:01,10 preprocessor,models\preprocessor_dataset_1_v1.joblib,5bde09f98fcc5ad6dc22d3a879e29455,3.4,fitted on the training part only
+2026-11-09 11:01,10 preprocessor,models\feature_names_dataset_1_v1.json,e8cd52108414b12177afbb9267df81ea,0.5,model input columns in order
+2026-11-09 11:01,10 preprocessor,models\preprocessor_dataset_2_v1.joblib,126a892b626da25cf9c60b205b93a072,3.4,fitted on the training part only
+2026-11-09 11:01,10 preprocessor,models\feature_names_dataset_2_v1.json,9ab52db131ad52ae7c0931f7fdc6e121,0.5,model input columns in order
+2026-11-09 11:02,13 logistic baseline,models\logistic_dataset_1_v1.joblib,93be7609864bae4e0a8cd6fd185de200,2.6,"logistic regression baseline, dataset_1"
+2026-11-09 11:02,14 sweep problem,models\rf_unconstrained_dataset_1_v1.joblib,d6a6bf4c80789c955f099f1587d36443,39359.3,"unconstrained Random Forest (comparison only), dataset_1"
+2026-11-09 11:02,15-17 monotonic forest,models\rf_monotonic_dataset_1_v1.joblib,22947c186386b08e0f64a33d4c8c125d,32259.2,"monotonic Random Forest, tuned, before calibration, dataset_1"
+2026-11-09 11:02,18 EBM,models\ebm_dataset_1_v1.joblib,aa305c4925fd00c938525350ef64e5e3,547.8,"monotonic EBM (Topic 4 comparison), dataset_1"
+2026-11-09 11:02,19 calibrate,models\rf_calibrated_dataset_1_v1.joblib,cf7ae1722308702c598a0c6836197664,32261.1,"FINAL model: calibrated monotonic Random Forest, dataset_1"
+2026-11-09 11:02,16-17 tuning,models\best_settings_dataset_1.json,302a9860d0d1b7056aec8ef6c252983b,0.1,"chosen Random Forest settings, dataset_1"
+2026-11-09 11:02,22 sweep,models\sweep_limits_dataset_1.json,3a3698426137f6f73ac31402c5cae2f8,0.2,"amount and loan-to-income limits for the sweep, dataset_1"
+2026-11-09 11:02,13 logistic baseline,models\logistic_dataset_2_v1.joblib,1c567b54fc066e4e2b92b6402b26ab76,2.6,"logistic regression baseline, dataset_2"
+2026-11-09 11:02,14 sweep problem,models\rf_unconstrained_dataset_2_v1.joblib,7ec45c7051c2144b9c5f402186025522,10854.9,"unconstrained Random Forest (comparison only), dataset_2"
+2026-11-09 11:02,15-17 monotonic forest,models\rf_monotonic_dataset_2_v1.joblib,b6ce0877871584c2c2fab15421c29576,12184.2,"monotonic Random Forest, tuned, before calibration, dataset_2"
+2026-11-09 11:02,18 EBM,models\ebm_dataset_2_v1.joblib,1fc55846f53e86be379dfb2cbccbe8a5,496.1,"monotonic EBM (Topic 4 comparison), dataset_2"
+2026-11-09 11:02,19 calibrate,models\rf_calibrated_dataset_2_v1.joblib,3ab38e582b04f3dbd0bc86d40c277176,12186.9,"FINAL model: calibrated monotonic Random Forest, dataset_2"
+2026-11-09 11:02,16-17 tuning,models\best_settings_dataset_2.json,f0808c291ea003285e753da0d0e5321b,0.1,"chosen Random Forest settings, dataset_2"
+2026-11-09 11:02,22 sweep,models\sweep_limits_dataset_2.json,f5bfac133a16a20e2c606ba124a8d318,0.2,"amount and loan-to-income limits for the sweep, dataset_2"
+2026-11-09 11:03,23 revocation,models\rf_monotonic_dataset_1_revocation_demo.joblib,62fd488e0b5d973b9bc291127a6568d8,32442.8,applicant D1-26978 removed; model retrained; old md5 22947c186386b08e0f64a33d4c8c125d
+2026-11-09 11:03,30 collect documents,rag_docs\external\eba_gl_2020_06_loan_origination.pdf,1acc6353b8dd71f63615082f1de9805b,780.9,RAG document
+2026-11-09 11:03,30 collect documents,rag_docs\external\eu_ai_act_2024_1689.pdf,e106a95b7b9be33e299551ccf51c13be,1278.5,RAG document
+2026-11-09 11:03,30 collect documents,rag_docs\project\datasheet.md,de6f7e0ea02f5a5a8c1153324c598c8c,3.0,RAG document
+2026-11-09 11:03,30 collect documents,rag_docs\project\data_quality.md,dddfdcba91666d6e1d75f12bff4def20,8.3,RAG document
+2026-11-09 11:03,30 collect documents,rag_docs\project\model_card.md,ed17dd79049c85a2afd387e1b09ce9c5,5.2,RAG document
+2026-11-09 11:03,30 collect documents,rag_docs\project\fairness_report.md,8e20920e38ec716b2f8b01eb152c1fc8,13.1,RAG document
+2026-11-09 11:03,30 collect documents,rag_docs\project\feature_glossary.md,923b21da21d0a0b4ac0d3e3dd3ab35e8,2.4,RAG document

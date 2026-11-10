@@ -1,0 +1,5 @@
+dataset,rule,validation_cases_caught,validation_accuracy_overall,validation_accuracy_on_caught,switched_on
+dataset_1,borderline,85,0.8501,0.7765,True
+dataset_1,disagreement,2257,0.8501,0.8551,False
+dataset_2,borderline,204,0.893,0.7794,True
+dataset_2,disagreement,92,0.893,0.8804,False

@@ -1,0 +1,36 @@
+column,single_feature_auc,verdict
+RiskScore,0.9873,likely leakage
+TotalDebtToIncomeRatio,0.9064,check before use
+MonthlyIncome,0.885,check before use
+AnnualIncome,0.8837,check before use
+InterestRate,0.7085,ok
+LoanAmount,0.6761,ok
+BaseInterestRate,0.6686,ok
+MonthlyLoanPayment,0.6504,ok
+EducationLevel,0.6253,ok
+Experience,0.5978,ok
+Age,0.597,ok
+CreditScore,0.5967,ok
+NetWorth,0.5953,ok
+TotalAssets,0.5896,ok
+LengthOfCreditHistory,0.5716,ok
+LoanDuration,0.5591,ok
+MonthlyDebtPayments,0.5464,ok
+PreviousLoanDefaults,0.523,ok
+TotalLiabilities,0.5225,ok
+HomeOwnershipStatus,0.5215,ok
+PaymentHistory,0.5196,ok
+BankruptcyHistory,0.5185,ok
+EmploymentStatus,0.518,ok
+LoanPurpose,0.5113,ok
+CreditCardUtilizationRate,0.5074,ok
+SavingsAccountBalance,0.5068,ok
+CheckingAccountBalance,0.5055,ok
+NumberOfCreditInquiries,0.5049,ok
+MaritalStatus,0.5043,ok
+NumberOfOpenCreditLines,0.5036,ok
+UtilityBillsPaymentHistory,0.5034,ok
+JobTenure,0.5025,ok
+DebtToIncomeRatio,0.5009,ok
+NumberOfDependents,0.5005,ok
+ApplicationDate,,skipped: date or free text
