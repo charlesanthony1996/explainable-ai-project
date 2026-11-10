@@ -1,0 +1,12 @@
+{
+  "age": 38,
+  "annual_income": 72000,
+  "credit_score": 720,
+  "loan_amount": 20000,
+  "loan_term_months": 36,
+  "marital_status": "Married",
+  "education": "Undergraduate",
+  "employment_status": "Employed",
+  "loan_purpose": "Home",
+  "dependents": 1
+}

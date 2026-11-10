@@ -1,0 +1,12 @@
+{
+  "age": 64,
+  "annual_income": 52000,
+  "credit_score": 640,
+  "loan_amount": 18000,
+  "loan_term_months": 60,
+  "marital_status": "Divorced",
+  "education": "High School",
+  "employment_status": "Self-Employed",
+  "loan_purpose": "Personal",
+  "dependents": 0
+}

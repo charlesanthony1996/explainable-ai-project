@@ -147,4 +147,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    # uv run main.py ask ...   -> the inference pathway (one applicant at a time)
+    # uv run main.py           -> the training pathway, as before
+    if len(sys.argv) > 1 and sys.argv[1] == "ask":
+        from explainable_ai_project.assistant import run_from_command_line
+        run_from_command_line(sys.argv[2:])
+    else:
+        main()
