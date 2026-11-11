@@ -310,14 +310,135 @@ def print_result(result):
 # main.py ask
 # ------------------------------------------------------------------
 
-def run_ask(values=None, question=None, configuration="C", prompt_version="v1"):
+# ------------------------------------------------------------------
+# Typing in an applicant
+#
+# The categories are read from the training data rather than written down
+# here, so they cannot drift apart from what the model was fitted on. That
+# matters more than it looks: the preprocessor uses handle_unknown="ignore",
+# so a purpose of "Car" instead of "Vehicle" is not rejected - it is encoded
+# as none of the four known purposes and the model answers anyway, with no
+# warning. `missing_data` only catches an EMPTY field, not a wrong one.
+# Checking the value here is the only place that gap is closed.
+# ------------------------------------------------------------------
+
+NUMBER_FIELDS = ["age", "dependents", "annual_income", "credit_score",
+                 "loan_amount", "loan_term_months"]
+CATEGORY_FIELDS = ["marital_status", "education", "employment_status",
+                   "loan_purpose"]
+
+FIELD_LABELS = {
+    "age": "Age (years)",
+    "dependents": "Dependants",
+    "annual_income": "Annual income",
+    "credit_score": "Credit score",
+    "loan_amount": "Amount requested",
+    "loan_term_months": "Term in months",
+    "marital_status": "Marital status",
+    "education": "Education",
+    "employment_status": "Employment",
+    "loan_purpose": "Purpose of the loan",
+}
+
+
+def known_categories(dataset_name="dataset_1"):
+    from explainable_ai_project.load_split import load_split
+
+    train = load_split(dataset_name, "train")["rows"]
+    return {name: sorted(train[name].dropna().unique())
+            for name in CATEGORY_FIELDS}
+
+
+def usual_ranges(dataset_name="dataset_1"):
+    from explainable_ai_project.deferral import load_deferral_settings
+
+    return load_deferral_settings(dataset_name)["usual_ranges"]
+
+
+def ask_for_number(name, low, high, default):
+    label = FIELD_LABELS[name]
+    while True:
+        shown = input("  " + label + " [" + str(default) + "]  usual "
+                      + str(round(low)) + " to " + str(round(high)) + ": ")
+        shown = shown.strip().replace(",", "").replace(" ", "")
+        if shown == "":
+            return default
+        try:
+            value = float(shown)
+        except ValueError:
+            print("    Not a number. Try again.")
+            continue
+        if name in ("age", "dependents", "loan_term_months"):
+            value = int(round(value))
+        if value < low or value > high:
+            # Allowed, but said out loud: the deferral rule will catch it and
+            # the case will be sent to a person.
+            print("    Outside the usual range - this will be flagged as an "
+                  "unusual input and sent to a human.")
+        return value
+
+
+def ask_for_category(name, choices, default):
+    label = FIELD_LABELS[name]
+    lowered = {one.lower(): one for one in choices}
+    while True:
+        print("  " + label + "  (" + " / ".join(choices) + ")")
+        shown = input("    [" + str(default) + "]: ").strip()
+        if shown == "":
+            return default
+        if shown.lower() in lowered:
+            return lowered[shown.lower()]
+        if shown.isdigit() and 1 <= int(shown) <= len(choices):
+            return choices[int(shown) - 1]
+        print("    Not one of the allowed values. The model was never trained "
+              "on anything else, and an unknown value would be silently "
+              "treated as 'none of these'.")
+
+
+def applicant_from_input(dataset_name="dataset_1"):
+    """Ask for the ten inputs, one at a time, with the training ranges shown."""
+
+    print("Type an applicant. Press Enter to keep the value in brackets.")
+    print()
+
+    ranges = usual_ranges(dataset_name)
+    choices = known_categories(dataset_name)
+    values = {}
+
+    for name in NUMBER_FIELDS:
+        low, high = ranges[name]
+        values[name] = ask_for_number(name, low, high, DEMO_APPLICANT[name])
+
+    print()
+    for name in CATEGORY_FIELDS:
+        values[name] = ask_for_category(name, choices[name],
+                                        DEMO_APPLICANT[name])
+
+    print()
+    question = input("  Your question [" + DEMO_QUESTION + "]: ").strip()
+    if question == "":
+        question = DEMO_QUESTION
+
+    print()
+    print("Applicant:")
+    print(applicant_as_text(values))
+    print()
+    return values, question
+
+
+def run_ask(values=None, question=None, configuration="C", prompt_version="v2",
+            interactive=False):
     """Answer one question for one applicant and log it."""
+
+    if interactive and values is None:
+        values, question = applicant_from_input()
 
     warm_up()   # never let the first real question be the one that loads the model
 
     if values is None:
         values = DEMO_APPLICANT
-        print("Using the example applicant (edit DEMO_APPLICANT in assistant.py):")
+        print("Using the example applicant.")
+        print("For your own: uv run main.py ask --interactive")
         print(applicant_as_text(values))
         print()
 

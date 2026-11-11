@@ -177,10 +177,10 @@ def stage_train():
 # ------------------------------------------------------------------
 # Inference and evaluation (both need Ollama)
 # ------------------------------------------------------------------
-def stage_ask():
+def stage_ask(interactive=False):
     from explainable_ai_project.assistant import run_ask
 
-    run_ask()
+    run_ask(interactive=interactive)
 
 
 def stage_evaluate(reuse_answers=False):
@@ -258,6 +258,12 @@ def main():
         help="evaluate only: redo the analysis on the answers already "
              "generated, without asking the model anything again",
     )
+    parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help="ask only: type in your own applicant instead of using the "
+             "example one",
+    )
     arguments = parser.parse_args()
 
     stage_name = arguments.stage
@@ -265,6 +271,8 @@ def main():
 
     if arguments.reuse_answers and stage_name != "evaluate":
         parser.error("--reuse-answers only applies to the evaluate stage")
+    if arguments.interactive and stage_name != "ask":
+        parser.error("--interactive only applies to the ask stage")
 
     print("=" * 70)
     print("running:", stage_name)
@@ -273,6 +281,8 @@ def main():
     started_at = time.time()
     if stage_name == "evaluate":
         exit_code = stage_function(reuse_answers=arguments.reuse_answers)
+    elif stage_name == "ask":
+        exit_code = stage_function(interactive=arguments.interactive)
     else:
         exit_code = stage_function()
     seconds = round(time.time() - started_at, 1)
