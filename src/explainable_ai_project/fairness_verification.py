@@ -158,27 +158,51 @@ def group_rates(codes, labels, predictions, how_many_groups):
 
 
 def spread(values):
-    """max - min and min / max over the groups where the value is defined."""
+    """max - min and min / max over the groups where the value is DEFINED.
+
+    Undefined is not zero, and the difference matters here. Model A predicts
+    approval for nobody aged 61 or over, so its precision in that group does
+    not exist - there are no approvals to be precise about. Step 24 records
+    it as 0.000 (scikit-learn's zero_division=0) and the predictive parity
+    difference then reads 0.847, which says the model is wildly less precise
+    for older applicants. It is not: a precision of 0 would mean every
+    approval it granted them was wrong, and it granted none.
+
+    Dropping the undefined group gives 0.005 across the three groups where
+    precision exists, and that is the number this project reports. It also
+    sharpens the point rather than softening it: precision is near-identical
+    wherever it can be measured, while the approval rates are not, which is
+    the impossibility result in one line.
+    """
 
     usable = values[~np.isnan(values)]
     if len(usable) < 2:
-        return np.nan, np.nan
+        return np.nan, np.nan, int(len(usable))
     highest = usable.max()
     lowest = usable.min()
     ratio = lowest / highest if highest > 0 else 0.0
-    return highest - lowest, ratio
+    return highest - lowest, ratio, int(len(usable))
 
 
-def metrics_from(rates):
-    predicted = rates["predicted_approval_rate"]
-    difference, ratio = spread(predicted)
-    opportunity, _ = spread(rates["true_positive_rate"])
-    predictive, _ = spread(rates["precision"])
-    return {
+def metrics_from(rates, with_counts=False):
+    difference, ratio, used_rate = spread(rates["predicted_approval_rate"])
+    opportunity, _, used_tpr = spread(rates["true_positive_rate"])
+    predictive, _, used_precision = spread(rates["precision"])
+
+    values = {
         "demographic_parity_difference": difference,
         "demographic_parity_ratio": ratio,
         "equal_opportunity_difference": opportunity,
         "predictive_parity_difference": predictive,
+    }
+    if not with_counts:
+        return values
+
+    return values, {
+        "demographic_parity_difference": used_rate,
+        "demographic_parity_ratio": used_rate,
+        "equal_opportunity_difference": used_tpr,
+        "predictive_parity_difference": used_precision,
     }
 
 
@@ -191,7 +215,7 @@ def verify_one(dataset_name, cut_off, probabilities, labels, codes,
     predictions = (probabilities >= cut_off).astype(float)
 
     observed_rates = group_rates(codes, labels, predictions, how_many_groups)
-    observed = metrics_from(observed_rates)
+    observed, groups_used = metrics_from(observed_rates, with_counts=True)
 
     # Which group the ratios are taken against, named rather than assumed.
     predicted_rate = observed_rates["predicted_approval_rate"]
@@ -258,6 +282,10 @@ def verify_one(dataset_name, cut_off, probabilities, labels, codes,
             "tolerance": str(tolerance["direction"]) + " " + str(tolerance["limit"]),
             "verdict": verdict,
             "reference_group": reference_group,
+            # How many of the four groups the metric could be computed on.
+            # Fewer than four means a group had no defined value and was left
+            # out rather than counted as zero.
+            "groups_used": groups_used[name],
             "replicates_usable": int(len(usable)),
         })
 
