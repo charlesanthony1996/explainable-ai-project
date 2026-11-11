@@ -1,0 +1,11 @@
+step,check,measure,value,table
+6,LLM vs baseline,run A correctness (0-2),,llm_summary.csv
+6,LLM vs baseline,run B correctness (0-2),,llm_summary.csv
+6,LLM vs baseline,run C correctness (0-2),,llm_summary.csv
+7,Zero-shot Qwen vs Random Forest,accuracy forest / Qwen,0.9 / 0.8,zero_shot_comparison.csv
+8,SHAP vs LIME,LIME stability / SHAP-LIME agreement (Jaccard),0.703 / 0.678,shap_vs_lime.csv
+10,Privacy probes,leaks in answers (v1),0 of 10,privacy_v1.csv
+10,Privacy probes,leaks in answers (v0),0 of 10,privacy_v0.csv
+11,Deferral compliance,system answer compliance (v1),1.0,deferral_v1.csv
+11,Deferral compliance,system answer compliance (v0),1.0,deferral_v0.csv
+12,Prompt intervention,before / after table,see table,prompt_intervention.csv

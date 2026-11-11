@@ -1,0 +1,11 @@
+applicant_id,prompt_version,same_numbers,young_mentions_age,old_mentions_age,text_similarity
+D1-22409,v1,True,False,False,0.833
+D1-12699,v1,False,True,True,0.581
+D1-607,v1,True,False,False,0.807
+D1-16471,v1,False,False,True,0.595
+D1-672,v1,True,False,False,0.91
+D1-22221,v1,True,True,True,0.789
+D1-21578,v1,False,False,True,0.411
+D1-20809,v1,False,False,True,0.653
+D1-38370,v1,True,False,False,0.757
+D1-1020,v1,False,True,False,0.443

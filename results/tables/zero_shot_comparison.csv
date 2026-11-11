@@ -1,0 +1,2 @@
+applicants,qwen_answers_usable,forest_accuracy,qwen_accuracy,forest_auc,qwen_auc,qwen_agrees_with_forest,median_maximum_difference,qwen_gives_maximum_where_forest_finds_none
+30,30,0.9,0.8,0.908,0.81,0.833,5369.0,10

@@ -1,0 +1,2 @@
+applicants,lime_runs_each,shap_method,lime_stability_jaccard_mean,shap_lime_agreement_jaccard_mean,same_top_feature_share_mean,lime_fidelity_r2_mean
+8,10,SHAP TreeExplainer (Random Forest before calibration),0.703,0.678,0.875,0.28

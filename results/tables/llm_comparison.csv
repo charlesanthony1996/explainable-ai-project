@@ -1,0 +1,3 @@
+comparison,meaning,correctness_mean_0_2_change,faithfulness_mean_0_2_change,numbers_ok_share_change,correct_refusal_share_change,mean_seconds_change
+A vs C,whole improvement,,,0.444,,1.0
+B vs C,what RAG adds,,,0.0,,0.3

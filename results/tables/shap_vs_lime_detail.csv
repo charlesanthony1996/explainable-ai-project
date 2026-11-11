@@ -1,0 +1,9 @@
+applicant_id,shap_top_5,lime_top_5_first_run,lime_stability_jaccard,shap_lime_agreement_jaccard,same_top_feature_share,lime_fidelity_r2_mean,lime_fidelity_r2_min
+D1-24596,"credit_score, annual_income, age, loan_to_income, loan_amount","credit_score, annual_income, loan_to_income, loan_amount, age",0.933,0.967,1.0,0.473,0.458
+D1-9648,"credit_score, annual_income, age, loan_amount, loan_to_income","credit_score, annual_income, loan_to_income, loan_amount, loan_purpose",0.547,0.571,1.0,0.123,0.113
+D1-49182,"credit_score, annual_income, age, loan_to_income, marital_status","credit_score, annual_income, loan_to_income, dependents, marital_status",0.517,0.587,1.0,0.102,0.098
+D1-42516,"credit_score, annual_income, loan_to_income, loan_amount, age","credit_score, annual_income, loan_to_income, loan_amount, loan_purpose",0.719,0.667,1.0,0.405,0.388
+D1-33322,"credit_score, annual_income, loan_to_income, age, loan_amount","credit_score, annual_income, loan_to_income, loan_amount, loan_purpose",0.683,0.643,1.0,0.123,0.115
+D1-7056,"credit_score, loan_to_income, annual_income, age, loan_amount","loan_to_income, annual_income, education, credit_score, dependents",0.568,0.548,0.0,0.047,0.041
+D1-20906,"credit_score, annual_income, loan_to_income, loan_amount, age","credit_score, annual_income, loan_to_income, loan_amount, employment_status",0.726,0.8,1.0,0.471,0.457
+D1-20434,"credit_score, annual_income, age, loan_to_income, loan_term_months","credit_score, annual_income, loan_to_income, loan_amount, age",0.933,0.643,1.0,0.495,0.483
