@@ -189,6 +189,12 @@ def stage_evaluate(reuse_answers=False):
     return run_evaluation(reuse_answers=reuse_answers)
 
 
+def stage_team_rubric(read_back=False):
+    from explainable_ai_project.team_rubric import run_team_rubric
+
+    return run_team_rubric(read_back=read_back)
+
+
 def stage_zones():
     from explainable_ai_project.human_control import run_zones
 
@@ -238,6 +244,7 @@ STAGES = {
     "verify_fairness": stage_verify_fairness,
     "provenance": stage_provenance,
     "zones": stage_zones,
+    "team_rubric": stage_team_rubric,
 }
 
 
@@ -264,6 +271,12 @@ def main():
         help="ask only: type in your own applicant instead of using the "
              "example one",
     )
+    parser.add_argument(
+        "--read",
+        action="store_true",
+        help="team_rubric only: read the filled scoring sheets back instead "
+             "of building the page",
+    )
     arguments = parser.parse_args()
 
     stage_name = arguments.stage
@@ -283,6 +296,8 @@ def main():
         exit_code = stage_function(reuse_answers=arguments.reuse_answers)
     elif stage_name == "ask":
         exit_code = stage_function(interactive=arguments.interactive)
+    elif stage_name == "team_rubric":
+        exit_code = stage_function(read_back=arguments.read)
     else:
         exit_code = stage_function()
     seconds = round(time.time() - started_at, 1)
