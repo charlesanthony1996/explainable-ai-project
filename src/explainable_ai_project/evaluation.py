@@ -60,6 +60,7 @@ Usage
     uv run main.py evaluate
 """
 
+import json
 import time
 from datetime import datetime
 from pathlib import Path
@@ -727,6 +728,282 @@ def rubric_template(answers, question_ids=None, dimensions=None):
 
 
 # ------------------------------------------------------------------
+# The sheet as a page to read, instead of a CSV to decipher
+#
+# A CSV was the wrong artefact for this job. Answers of up to 336 words sit
+# in one cell, and a German Excel reads a comma-separated file into a single
+# column because it expects semicolons, so the whole sheet arrives as one
+# wall of text. Neither problem is the rater's fault.
+#
+# This writes a self-contained page instead: one card per answer, the
+# reference facts beside it, two sets of buttons, and a download that
+# produces exactly the CSV the analysis expects. Nothing is loaded from the
+# network and nothing leaves the machine.
+# ------------------------------------------------------------------
+
+RUBRIC_PAGE_FILE = TABLES_FOLDER / "evaluation_rubric_sheet.html"
+
+DIMENSION_LABELS = {
+    "correctness_0_1_2": (
+        "Korrektheit",
+        ["0 - falscher Betrag, oder behauptet einen Betrag, obwohl keiner gefunden wurde",
+         "1 - im Kern richtig, laesst aber Wesentliches aus (Obergrenze, menschliche Pruefung)",
+         "2 - vollstaendig richtig"],
+    ),
+    "clarity_0_1_2": (
+        "Verstaendlichkeit",
+        ["0 - Fachjargon ohne Erklaerung, oder unverstaendlich",
+         "1 - verstaendlich, aber umstaendlich oder lueckenhaft",
+         "2 - klar und vollstaendig"],
+    ),
+    "faithfulness_0_1_2": (
+        "Quellentreue",
+        ["0 - widerspricht der Quelle oder erfindet eine Regel",
+         "1 - teilweise gestuetzt",
+         "2 - vollstaendig gestuetzt"],
+    ),
+}
+
+
+def rubric_page(sheet, path=RUBRIC_PAGE_FILE):
+    """Write the scoring sheet as a local page."""
+
+    dimensions = scores_present(sheet)
+    rows = []
+    for _, row in sheet.iterrows():
+        facts = []
+        maximum = row["estimated_maximum"]
+        if bool(row["no_amount_found"]):
+            facts.append(("Geschaetztes Maximum", "KEINES gefunden"))
+        else:
+            note = " (an der Obergrenze)" if bool(row["max_is_upper_limit"]) else ""
+            facts.append(("Geschaetztes Maximum", f"{maximum:,.0f}".replace(",", ".") + note))
+        facts.append(("Fall markiert",
+                      "JA - menschliche Pruefung muss genannt werden"
+                      if bool(row["deferral_flagged"]) else "nein"))
+        if isinstance(row["expected_document"], str) and row["expected_document"]:
+            facts.append(("Erwartete Quelle", row["expected_document"]))
+
+        rows.append({
+            "order": int(row["rating_order"]),
+            "question_id": row["question_id"],
+            "question": row["question"],
+            "applicant": row["applicant"],
+            "category": row["category"],
+            "facts": facts,
+            "answer": row["answer"],
+            "hidden": row["configuration_hidden"],
+        })
+
+    data = json.dumps({"rows": rows, "dimensions": [
+        {"key": key, "label": DIMENSION_LABELS[key][0],
+         "options": DIMENSION_LABELS[key][1]} for key in dimensions
+    ]}, ensure_ascii=False)
+
+    html = RUBRIC_PAGE_TEMPLATE.replace("__DATA__", data)
+    path.write_text(html, encoding="utf-8")
+    return path
+
+
+RUBRIC_PAGE_TEMPLATE = """<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bewertungsbogen</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --card: #ffffff; --ink: #1b1b1a; --muted: #6a6a66;
+    --line: #dddcd7; --accent: #1f5fa8; --warn: #b02828; --ok: #1f7a4d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0 16px 120px; background: var(--bg); color: var(--ink);
+         font: 16px/1.6 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 10; background: var(--bg);
+           border-bottom: 1px solid var(--line); padding: 14px 0 10px;
+           margin: 0 -16px 20px; padding-left: 16px; padding-right: 16px; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; }
+  .bar { height: 6px; background: var(--line); border-radius: 3px; margin-top: 10px; }
+  .bar div { height: 100%; width: 0%; background: var(--ok); border-radius: 3px;
+             transition: width .2s; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+          padding: 18px 20px; margin-bottom: 18px; }
+  .card.done { border-left: 4px solid var(--ok); }
+  .num { font-weight: 700; color: var(--accent); }
+  .q { font-weight: 600; margin: 2px 0 12px; }
+  .facts { background: #fafaf8; border: 1px solid var(--line); border-radius: 8px;
+           padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
+  .facts div { display: flex; gap: 8px; }
+  .facts b { min-width: 190px; color: var(--muted); font-weight: 500; }
+  .flag { color: var(--warn); font-weight: 600; }
+  .answer { white-space: pre-wrap; background: #fbfbf9; border: 1px solid var(--line);
+            border-left: 3px solid var(--accent); border-radius: 6px;
+            padding: 14px 16px; margin-bottom: 16px; }
+  .dim { margin-bottom: 12px; }
+  .dim > b { display: block; margin-bottom: 6px; font-size: 15px; }
+  label { display: block; cursor: pointer; padding: 5px 10px; border-radius: 6px;
+          font-size: 14px; }
+  label:hover { background: #f0f0ec; }
+  input[type=radio] { margin-right: 8px; }
+  textarea { width: 100%; border: 1px solid var(--line); border-radius: 6px;
+             padding: 8px; font: inherit; font-size: 14px; resize: vertical; }
+  footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+           border-top: 1px solid var(--line); padding: 12px 16px; }
+  .frow { max-width: 860px; margin: 0 auto; display: flex; gap: 12px;
+          align-items: center; flex-wrap: wrap; }
+  button { font: inherit; padding: 9px 16px; border-radius: 7px; cursor: pointer;
+           border: 1px solid var(--accent); background: var(--accent); color: #fff; }
+  button.ghost { background: #fff; color: var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  input[type=text] { font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+                     border-radius: 6px; }
+  @media (max-width: 640px) { .facts b { min-width: 0; display: block; } .facts div { display: block; } }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Bewertungsbogen - Erklaerungsqualitaet</h1>
+  <div class="sub" id="status">0 von 0 bewertet</div>
+  <div class="bar"><div id="bar"></div></div>
+</div></header>
+
+<div class="wrap" id="cards"></div>
+
+<footer><div class="frow">
+  <label style="padding:0">Name: <input type="text" id="rater" placeholder="Michael oder Charles"></label>
+  <button id="save" disabled>CSV herunterladen</button>
+  <button class="ghost" id="clear">Eingaben loeschen</button>
+  <span class="sub" id="hint"></span>
+</div></footer>
+
+<script>
+const DATA = __DATA__;
+const KEY = "rubrik-v1";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+
+const cards = document.getElementById("cards");
+DATA.rows.forEach(row => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.id = "card-" + row.order;
+
+  let facts = row.facts.map(([k, v]) => {
+    const warn = String(v).startsWith("JA") ? ' class="flag"' : "";
+    return `<div><b>${k}</b><span${warn}>${v}</span></div>`;
+  }).join("");
+
+  let dims = DATA.dimensions.map(d => {
+    const opts = d.options.map((text, value) =>
+      `<label><input type="radio" name="${d.key}-${row.order}" value="${value}">${text}</label>`
+    ).join("");
+    return `<div class="dim"><b>${d.label}</b>${opts}</div>`;
+  }).join("");
+
+  card.innerHTML = `
+    <div><span class="num">${row.order} von ${DATA.rows.length}</span>
+         <span class="sub"> &middot; ${row.question_id} &middot; ${row.category}
+         &middot; Antragsteller ${row.applicant}</span></div>
+    <div class="q">${row.question}</div>
+    <div class="facts">${facts}</div>
+    <div class="answer">${row.answer.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</div>
+    ${dims}
+    <div class="dim"><b>Notiz (optional)</b>
+      <textarea rows="2" id="note-${row.order}"></textarea></div>`;
+  cards.appendChild(card);
+});
+
+function restore() {
+  DATA.rows.forEach(row => {
+    const saved = state[row.order] || {};
+    DATA.dimensions.forEach(d => {
+      if (saved[d.key] !== undefined) {
+        const el = document.querySelector(`input[name="${d.key}-${row.order}"][value="${saved[d.key]}"]`);
+        if (el) el.checked = true;
+      }
+    });
+    if (saved.note) document.getElementById("note-" + row.order).value = saved.note;
+  });
+  if (state.__rater) document.getElementById("rater").value = state.__rater;
+}
+
+function collect() {
+  const out = [];
+  DATA.rows.forEach(row => {
+    const entry = { note: document.getElementById("note-" + row.order).value };
+    DATA.dimensions.forEach(d => {
+      const picked = document.querySelector(`input[name="${d.key}-${row.order}"]:checked`);
+      if (picked) entry[d.key] = Number(picked.value);
+    });
+    out.push({ row, entry });
+  });
+  return out;
+}
+
+function refresh() {
+  const all = collect();
+  let complete = 0;
+  all.forEach(({ row, entry }) => {
+    const done = DATA.dimensions.every(d => entry[d.key] !== undefined);
+    if (done) complete++;
+    document.getElementById("card-" + row.order).classList.toggle("done", done);
+    state[row.order] = entry;
+  });
+  state.__rater = document.getElementById("rater").value;
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+
+  const total = DATA.rows.length;
+  document.getElementById("status").textContent = complete + " von " + total + " bewertet";
+  document.getElementById("bar").style.width = (100 * complete / total) + "%";
+  document.getElementById("save").disabled = complete === 0;
+  document.getElementById("hint").textContent = complete < total
+    ? "Teilstand reicht - fehlende Zeilen werden beim Auswerten gemeldet."
+    : "Vollstaendig.";
+}
+
+document.addEventListener("input", refresh);
+document.addEventListener("change", refresh);
+
+document.getElementById("clear").onclick = () => {
+  if (!confirm("Alle Eingaben auf dieser Seite loeschen?")) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+};
+
+document.getElementById("save").onclick = () => {
+  const rater = document.getElementById("rater").value || "";
+  const cols = ["rating_order", "question_id", "category"]
+    .concat(DATA.dimensions.map(d => d.key))
+    .concat(["rater", "note", "configuration_hidden"]);
+  const esc = v => {
+    const s = v === undefined || v === null ? "" : String(v);
+    return /[",\\n\\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const lines = [cols.join(",")];
+  collect().forEach(({ row, entry }) => {
+    const values = [row.order, row.question_id, row.category]
+      .concat(DATA.dimensions.map(d => entry[d.key] === undefined ? "" : entry[d.key]))
+      .concat([rater, entry.note, row.hidden]);
+    lines.push(values.map(esc).join(","));
+  });
+  const blob = new Blob(["\\ufeff" + lines.join("\\r\\n")], {type: "text/csv;charset=utf-8"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "evaluation_rubric_filled.csv";
+  link.click();
+};
+
+restore();
+refresh();
+</script>
+</body>
+</html>
+"""
+
+
+# ------------------------------------------------------------------
 # Reading the filled-in sheet back
 # ------------------------------------------------------------------
 
@@ -741,11 +1018,30 @@ def scores_present(sheet):
     return [name for name in ALL_RUBRIC_SCORES if name in sheet.columns]
 
 
+def find_filled_sheet(path=RUBRIC_FILLED_FILE):
+    """Where the scored sheet is, including where the browser put it.
+
+    The page downloads the file, and a browser downloads to Downloads. Asking
+    someone to move it first is one more step to forget, so the usual places
+    are checked and the one that is used is named.
+    """
+
+    candidates = [path, Path.home() / "Downloads" / path.name,
+                  Path.home() / "Downloads" / "evaluation_rubric_filled.csv"]
+    found = [one for one in candidates if one.exists()]
+    if not found:
+        return None
+    return max(found, key=lambda one: one.stat().st_mtime)
+
+
 def read_rubric(path=RUBRIC_FILLED_FILE):
     """Load the scored sheet and check it before anything is computed."""
 
+    path = find_filled_sheet(path) or path
     if not path.exists():
-        return None, ["No scored sheet at " + str(path)]
+        return None, ["No scored sheet at " + str(path)
+                      + " and none in the Downloads folder"]
+    print("Reading:", path)
 
     sheet = pd.read_csv(path)
     problems = []
@@ -884,6 +1180,7 @@ def analyse(answers):
 
     sheet = rubric_template(answers)
     sheet.to_csv(RUBRIC_FILE, index=False)
+    rubric_page(sheet)
 
     print()
     print("-" * 70)
@@ -909,12 +1206,15 @@ def analyse(answers):
     print("-" * 70)
     print("WRITTEN")
     print("-" * 70)
-    for path in [ANSWERS_FILE, SUMMARY_FILE, CATEGORY_FILE, PAIRED_FILE, RUBRIC_FILE]:
+    for path in [ANSWERS_FILE, SUMMARY_FILE, CATEGORY_FILE, PAIRED_FILE,
+                 RUBRIC_FILE, RUBRIC_PAGE_FILE]:
         print("  ", path.relative_to(PROJECT_ROOT))
 
     print()
-    print("  Still to do by hand:", RUBRIC_FILE.name,
-          "- 0/1/2 for correctness, faithfulness and clarity.")
+    print("  Still to do by hand: open", RUBRIC_PAGE_FILE.name,
+          "in a browser and rate the", len(RUBRIC_QUESTIONS) * len(CONFIGURATIONS),
+          "answers.")
+    print("  Then: uv run main.py rubric")
     print("  Finished at", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     return 0

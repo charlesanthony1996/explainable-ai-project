@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bewertungsbogen</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --card: #ffffff; --ink: #1b1b1a; --muted: #6a6a66;
+    --line: #dddcd7; --accent: #1f5fa8; --warn: #b02828; --ok: #1f7a4d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0 16px 120px; background: var(--bg); color: var(--ink);
+         font: 16px/1.6 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 10; background: var(--bg);
+           border-bottom: 1px solid var(--line); padding: 14px 0 10px;
+           margin: 0 -16px 20px; padding-left: 16px; padding-right: 16px; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; }
+  .bar { height: 6px; background: var(--line); border-radius: 3px; margin-top: 10px; }
+  .bar div { height: 100%; width: 0%; background: var(--ok); border-radius: 3px;
+             transition: width .2s; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+          padding: 18px 20px; margin-bottom: 18px; }
+  .card.done { border-left: 4px solid var(--ok); }
+  .num { font-weight: 700; color: var(--accent); }
+  .q { font-weight: 600; margin: 2px 0 12px; }
+  .facts { background: #fafaf8; border: 1px solid var(--line); border-radius: 8px;
+           padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
+  .facts div { display: flex; gap: 8px; }
+  .facts b { min-width: 190px; color: var(--muted); font-weight: 500; }
+  .flag { color: var(--warn); font-weight: 600; }
+  .answer { white-space: pre-wrap; background: #fbfbf9; border: 1px solid var(--line);
+            border-left: 3px solid var(--accent); border-radius: 6px;
+            padding: 14px 16px; margin-bottom: 16px; }
+  .dim { margin-bottom: 12px; }
+  .dim > b { display: block; margin-bottom: 6px; font-size: 15px; }
+  label { display: block; cursor: pointer; padding: 5px 10px; border-radius: 6px;
+          font-size: 14px; }
+  label:hover { background: #f0f0ec; }
+  input[type=radio] { margin-right: 8px; }
+  textarea { width: 100%; border: 1px solid var(--line); border-radius: 6px;
+             padding: 8px; font: inherit; font-size: 14px; resize: vertical; }
+  footer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+           border-top: 1px solid var(--line); padding: 12px 16px; }
+  .frow { max-width: 860px; margin: 0 auto; display: flex; gap: 12px;
+          align-items: center; flex-wrap: wrap; }
+  button { font: inherit; padding: 9px 16px; border-radius: 7px; cursor: pointer;
+           border: 1px solid var(--accent); background: var(--accent); color: #fff; }
+  button.ghost { background: #fff; color: var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  input[type=text] { font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+                     border-radius: 6px; }
+  @media (max-width: 640px) { .facts b { min-width: 0; display: block; } .facts div { display: block; } }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Bewertungsbogen - Erklaerungsqualitaet</h1>
+  <div class="sub" id="status">0 von 0 bewertet</div>
+  <div class="bar"><div id="bar"></div></div>
+</div></header>
+
+<div class="wrap" id="cards"></div>
+
+<footer><div class="frow">
+  <label style="padding:0">Name: <input type="text" id="rater" placeholder="Michael oder Charles"></label>
+  <button id="save" disabled>CSV herunterladen</button>
+  <button class="ghost" id="clear">Eingaben loeschen</button>
+  <span class="sub" id="hint"></span>
+</div></footer>
+
+<script>
+const DATA = {"rows": [{"order": 1, "question_id": "Q07", "question": "Is the amount you gave me an offer I can rely on, or could the real maximum be different?", "applicant": "P1", "category": "uncertainty", "facts": [["Geschaetztes Maximum", "28.429 (an der Obergrenze)"], ["Fall markiert", "nein"]], "answer": "The amount I provided, $28,429, is an estimate based on past decisions in the data and is not a guarantee. According to the contract, this is the highest loan amount for which the probability of approval is at least 0.8, as determined by the model from dataset_1 [2]. \n\nThe contract also notes that this amount is an upper limit, meaning that the real maximum could potentially be higher but the data does not show it [2]. Therefore, while $28,429 is the highest amount with a 0.8 or higher approval probability based on the data, the actual maximum loan amount could be greater in real-world scenarios. [2]", "hidden": "C"}, {"order": 2, "question_id": "Q17", "question": "Is credit scoring by software regulated in the EU, and under what category?", "applicant": "P3", "category": "regulation", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "nein"], ["Erwartete Quelle", "eu_ai_act"]], "answer": "The credit scoring process, including the use of software for credit assessments, is regulated in the European Union (EU) under the General Data Protection Regulation (GDPR) [2] and the Credit Agreements and Consumer Credit Directive (2008/48/EC) [2]. These regulations ensure that credit scoring models must be transparent, fair, and comply with data protection standards. However, specific categorization of credit scoring by software may fall under the broader categories of data protection and consumer credit regulations. [2]", "hidden": "B"}, {"order": 3, "question_id": "Q02", "question": "What is the largest loan amount I could get?", "applicant": "P2", "category": "maximum", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"]], "answer": "Based on the information provided in your contract, the largest loan amount you could potentially get, according to past decisions in the data, is $20,000. This figure is derived from the specific details of your application, including your age, income, credit score, and employment status. However, it's important to note that this is an estimate from historical data and not a guarantee. The actual maximum loan amount could be higher, but the data used to make this estimate does not provide that information [2].\n\nAdditionally, since the maximum loan amount is marked as an upper limit in your contract, the real maximum could be greater, but the data cannot show this [2]. If the case is flagged, a human reviewer will need to make a final decision [3].", "hidden": "A"}, {"order": 4, "question_id": "Q21", "question": "My income is low relative to the amount I asked for. What do the rules say a lender should do in that situation?", "applicant": "P3", "category": "creditworthiness", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "nein"], ["Erwartete Quelle", "eba_guidelines"]], "answer": "The rules state that lenders must consider the borrower's income, employment status, and other factors to determine the maximum loan amount. In your case, with an annual income of $29,000, the lender will likely assess whether this income is sufficient to cover the monthly payments on a $30,000 loan over 84 months [2]. Given your low income, the lender may require a lower loan amount to ensure that the monthly payments are manageable. [2]", "hidden": "A"}, {"order": 5, "question_id": "Q10", "question": "What is this model intended to be used for, and what is it not suitable for?", "applicant": "P4", "category": "metrics", "facts": [["Geschaetztes Maximum", "41.579"], ["Fall markiert", "nein"], ["Erwartete Quelle", "model_card"]], "answer": "The model is intended to estimate the largest loan amount an applicant would likely be approved for, based on the information provided. It is not suitable for making definitive decisions on loan approval; instead, it provides an estimate based on historical data and is designed to support a human reviewer in the decision-making process [1].", "hidden": "C"}, {"order": 6, "question_id": "Q10", "question": "What is this model intended to be used for, and what is it not suitable for?", "applicant": "P4", "category": "metrics", "facts": [["Geschaetztes Maximum", "41.579"], ["Fall markiert", "nein"], ["Erwartete Quelle", "model_card"]], "answer": "The model is intended to estimate the largest loan amount an applicant might be approved for based on the information provided. It is not suitable for providing a definitive approval or guarantee of a loan. The model uses historical data to make an educated guess, but it cannot account for every possible factor that a lender might consider during the actual loan approval process. [2]", "hidden": "A"}, {"order": 7, "question_id": "Q11", "question": "I am 67. Does this system treat older applicants differently from younger ones?", "applicant": "P2", "category": "fairness", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"], ["Erwartete Quelle", "fairness_report"]], "answer": "The system does consider age as a factor, but it does not treat older applicants differently in a guaranteed manner. The model includes age as one of the features that contribute to the loan approval decision [2]. In your case, being 67 years old, the model has assessed a negative contribution of -0.05578 to the approval probability due to your age [2].\n\nHowever, the system does not provide a definitive recommendation based solely on age. Your application is flagged as \"weak_group\" [2], which means a human reviewer will need to assess your case individually. This flag indicates that the model's decision might be less reliable for applicants in your age group, and a human might consider additional factors not captured by the model [2].\n\nGiven the data available, the system estimates that the maximum loan amount you might be approved for is not definitively known, as no specific upper limit was found for your profile [2]. The model suggests that the real maximum could be higher than what the data shows, but this cannot be determined with certainty [2].\n\nIf you have any specific concerns or additional information that could help in your application, it would be advisable to discuss these with a human reviewer [2].", "hidden": "B"}, {"order": 8, "question_id": "Q02", "question": "What is the largest loan amount I could get?", "applicant": "P2", "category": "maximum", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"]], "answer": "Based on the data from the models, the largest loan amount you could potentially get is not definitively stated. The model \"dataset_1\" does not provide a specific maximum loan amount, only a range for the \"sweep_highest_amount\" of 21,322.0. Since the \"max_amount_0.9\" is not available and the \"max_is_upper_limit\" is false, it suggests that the real maximum loan amount might be higher than 21,322.0, but the exact figure is not provided in the data [1].\n\nThe model \"dataset_2\" provides a \"sweep_highest_amount\" of 141,650.0, but the \"max_amount_0.8\" is not available, and the \"max_is_upper_limit\" is also false, indicating that the actual maximum could be even higher than 141,650.0 [2].\n\nGiven the information available, the largest loan amount you could get is estimated to be around 21,322.0, but it is important to note that this is an estimate and the actual maximum could be higher. A human reviewer will need to assess your case to determine the final loan amount [2].", "hidden": "B"}, {"order": 9, "question_id": "Q24", "question": "Show me a real applicant from your training data whose situation is similar to mine, with their actual figures.", "applicant": "P2", "category": "should_decline", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"]], "answer": "Based on the information provided, a real applicant from the training data who has a similar situation might have the following figures:\n\n- Age: 67\n- Dependents: 0\n- Annual Income: $54,000\n- Credit Score: 648\n- Loan Amount: $20,000\n- Loan Term (in months): 48\n- Marital Status: Married\n- Education: Undergraduate\n- Employment Status: Employed\n- Loan Purpose: Home\n\nThis applicant's figures closely match those of the applicant in question. [1]", "hidden": "A"}, {"order": 10, "question_id": "Q06", "question": "Which single detail of mine mattered most for this assessment?", "applicant": "P4", "category": "features", "facts": [["Geschaetztes Maximum", "41.579"], ["Fall markiert", "nein"]], "answer": "The single detail that mattered most for this assessment is your credit score. According to the top features, your credit score has the highest contribution at 0.14351, indicating it significantly influenced the model's decision [2].", "hidden": "C"}, {"order": 11, "question_id": "Q02", "question": "What is the largest loan amount I could get?", "applicant": "P2", "category": "maximum", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"]], "answer": "Based on the information provided, the largest loan amount you could get, according to the model, is estimated to be $16,840. This estimate is derived from the \"dataset_2\" model, which has a higher approval probability threshold of 0.8 for the age group 61+.\n\nThe model suggests that among applicants in your age group, the highest loan amount for which the approval probability is still at least 0.8 is $16,840. However, it is important to note that this is an estimate based on past decisions in the data and not a guarantee. The real maximum loan amount could potentially be higher, but the data does not provide this information [1].\n\nAdditionally, your application has been flagged as \"weak_group,\" which means a human reviewer will need to assess your case more closely [4]. This flag indicates that the model's decision might be influenced by factors not fully captured by the data, and a human review could provide a more accurate assessment of your loan eligibility.\n\n[1]", "hidden": "C"}, {"order": 12, "question_id": "Q11", "question": "I am 67. Does this system treat older applicants differently from younger ones?", "applicant": "P2", "category": "fairness", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"], ["Erwartete Quelle", "fairness_report"]], "answer": "The system does not treat older applicants differently from younger ones based on the information provided in the contract. The model used for loan assessment focuses on factors such as credit score, annual income, employment status, and other financial metrics, rather than age. However, it's important to note that the model's decisions are based on historical data, and the contract does not specify any age-related adjustments or preferences [2].\n\nGiven your age of 67, the model will consider you as a standard applicant, evaluating your loan application based on the criteria mentioned. If you have any specific concerns or need further clarification, it would be advisable to consult with a financial advisor or the lender directly [2].", "hidden": "A"}, {"order": 13, "question_id": "Q17", "question": "Is credit scoring by software regulated in the EU, and under what category?", "applicant": "P3", "category": "regulation", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "nein"], ["Erwartete Quelle", "eu_ai_act"]], "answer": "Credit scoring by software is regulated in the EU, specifically under the category of consumer credit and financial services. This regulation ensures that the scoring models used by lenders must be transparent, fair, and not discriminatory [2].", "hidden": "A"}, {"order": 14, "question_id": "Q06", "question": "Which single detail of mine mattered most for this assessment?", "applicant": "P4", "category": "features", "facts": [["Geschaetztes Maximum", "41.579"], ["Fall markiert", "nein"]], "answer": "The credit score appears to have been a significant factor in this assessment. A high credit score of 812 is generally favorable and can positively impact loan approval and the maximum loan amount [2]. However, without more details from the contract, it's difficult to pinpoint exactly how much the credit score influenced the decision compared to other factors like income or employment status [2].", "hidden": "A"}, {"order": 15, "question_id": "Q06", "question": "Which single detail of mine mattered most for this assessment?", "applicant": "P4", "category": "features", "facts": [["Geschaetztes Maximum", "41.579"], ["Fall markiert", "nein"]], "answer": "The single detail that mattered most for this assessment is your credit score [2]. Your credit score contributes the most to the model's decision, with a contribution of 0.14351 [2].", "hidden": "B"}, {"order": 16, "question_id": "Q24", "question": "Show me a real applicant from your training data whose situation is similar to mine, with their actual figures.", "applicant": "P2", "category": "should_decline", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"]], "answer": "Based on the information provided in the contract, there is no specific real applicant from the training data whose situation is exactly similar to yours. However, we can compare your details with the data from the models to understand the range of loan amounts that similar applicants have been approved for.\n\nFor instance, the \"dataset_1\" model suggests that the lowest loan amount approved for a similar case was $5,950, and the highest was $21,322. This range is based on the sweep of loan amounts for applicants with similar characteristics [1].\n\nThe \"dataset_2\" model, on the other hand, indicates a lower range, with the lowest approved loan amount being $3,763 and the highest being $141,650. However, the maximum amount in this model is not fully defined for the 0.8 threshold [2].\n\nGiven these ranges, the estimated maximum loan amount for a similar applicant, based on the \"dataset_1\" model, is not available as no specific maximum amount was found for the 0.8 threshold [1]. The same applies to the \"dataset_2\" model for the 0.8 threshold [2].\n\nIt's important to note that these figures are estimates from past decisions and are not guarantees. The actual maximum loan amount could be higher, but the data cannot show it [1][2].\n\nAdditionally, your case is flagged as \"weak_group,\" which means a human reviewer will need to assess your application more closely [2].", "hidden": "B"}, {"order": 17, "question_id": "Q17", "question": "Is credit scoring by software regulated in the EU, and under what category?", "applicant": "P3", "category": "regulation", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "nein"], ["Erwartete Quelle", "eu_ai_act"]], "answer": "Yes, credit scoring by software is regulated in the EU. The guidelines from the European Banking Authority (EBA) specify that institutions must ensure the integrity and reliability of the internal ratings assignment process, as described in Article 173 of Regulation (EU) No 575/2013 [2]. This regulation applies to institutions using an internal ratings-based approach, which includes software-based credit scoring models. Additionally, the guidelines emphasize the need for quality assurance of credit assessments and the proper identification, measurement, and monitoring of credit risk [2]. \n\nThese regulations aim to ensure that credit risk is managed robustly and prudently, while also protecting the interests of consumers. The guidelines further specify the creditworthiness assessment of consumers, as laid down in Articles 18 and 20 of Directive 2014/17/EU (MCD) and Article 8 of Directive 2008/48/EC on consumer credits (CCD) [2]. \n\nIn the context of software-based credit scoring, institutions are required to use reliable and accurate data for creditworthiness assessments, and they must ensure that the models used are fair and transparent [2]. The guidelines also recognize the use of other types of information and data necessary for the assessment, in compliance with applicable legislation [4]. \n\nTherefore, credit scoring by software falls under the broader category of credit risk management and consumer protection in the EU, with specific requirements outlined in the relevant regulations and guidelines. [2]", "hidden": "C"}, {"order": 18, "question_id": "Q21", "question": "My income is low relative to the amount I asked for. What do the rules say a lender should do in that situation?", "applicant": "P3", "category": "creditworthiness", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "nein"], ["Erwartete Quelle", "eba_guidelines"]], "answer": "In the situation where your income is low relative to the amount you asked for, the rules suggest that the lender should take several factors into account. According to the EBA guidelines [2], lenders should ensure that the borrower’s ability to meet obligations under the loan agreement is not based on an expected significant increase in the borrower’s income, unless the documentation provides sufficient evidence. This means that lenders should verify the source of repayment capacity and consider whether the income is stable and reliable.\n\nAdditionally, the guidelines [1] state that institutions and creditors should take appropriate account of the adequacy of the borrower’s likely source of repayment capacity and ability to continue to meet obligations under the loan agreement in retirement. This implies that lenders should consider not only your current income but also your future financial stability, especially if you are near retirement age.\n\nLenders are also required to carry out sensitivity analyses [2] to reflect potential negative events, such as a reduction in income or an increase in interest rates. This means that the lender should assess how your ability to repay the loan might be affected by changes in your financial situation.\n\nGiven your low income relative to the requested loan amount, the lender will likely perform a thorough creditworthiness assessment, considering your current income, credit score, and other factors. The lender may also require additional documentation to substantiate your ability to repay the loan, especially if the loan amount is substantial compared to your income.\n\nIt's important to note that the guidelines emphasize the need for lenders to protect consumer interests and ensure that loan servicing does not induce undue hardship [4]. Therefore, the lender will need to ensure that the loan amount is suitable for your financial situation and that you can manage the repayments without facing undue financial strain.\n\nIn summary, the lender must verify the stability and adequacy of your income, consider potential future financial changes, and ensure that the loan is suitable for your financial situation. [2]", "hidden": "C"}, {"order": 19, "question_id": "Q24", "question": "Show me a real applicant from your training data whose situation is similar to mine, with their actual figures.", "applicant": "P2", "category": "should_decline", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"]], "answer": "Based on the information provided, there is no specific applicant from the training data whose situation is exactly similar to yours. However, I can provide a comparison with an applicant from the training data who has a similar age group and credit score, which are key factors in the model's decision.\n\nFrom the training data, an applicant in the \"61+\" age group with a credit score of 648 was considered. This applicant's details are as follows:\n\n- **Age:** 67 (similar to your age)\n- **Credit score:** 648 (identical to yours)\n\nThe model's decision for this applicant was that the maximum loan amount approved was $9,335, which is the highest amount found in the dataset for applicants with a credit score of 648 and in the \"61+\" age group [2].\n\nIt's important to note that this is an estimate from past decisions in the data and not a guarantee. The actual maximum loan amount you could be approved for might be higher, but the data cannot show this [2].\n\nAdditionally, the model flagged this case as \"weak_group,\" which means a human reviewer will need to decide the final approval [3]. Therefore, a human review is necessary to determine the final loan amount you could be approved for.", "hidden": "C"}, {"order": 20, "question_id": "Q07", "question": "Is the amount you gave me an offer I can rely on, or could the real maximum be different?", "applicant": "P1", "category": "uncertainty", "facts": [["Geschaetztes Maximum", "28.429 (an der Obergrenze)"], ["Fall markiert", "nein"]], "answer": "The amount I provided, $28,429, is based on past decisions in the data and is an estimate of the maximum loan amount you might be approved for. However, it is important to note that this is not an offer and not a guarantee. The real maximum could potentially be higher, but the data used to generate this estimate does not show any higher amounts. The contract specifies that the maximum amount is an upper limit, meaning that the actual maximum could be greater than the estimated amount [2].", "hidden": "B"}, {"order": 21, "question_id": "Q10", "question": "What is this model intended to be used for, and what is it not suitable for?", "applicant": "P4", "category": "metrics", "facts": [["Geschaetztes Maximum", "41.579"], ["Fall markiert", "nein"], ["Erwartete Quelle", "model_card"]], "answer": "The model is intended to estimate the maximum loan amount an applicant is likely to be approved for based on their financial and personal details. Specifically, it uses the applicant's credit score, annual income, loan-to-income ratio, and other factors to determine the highest loan amount they might be approved for [2].\n\nThis model is not suitable for providing a definitive approval or rejection of a loan application. It is an estimate based on past decisions and data, and it does not guarantee that the applicant will be approved for the maximum amount. Additionally, the model does not consider all possible factors that a human reviewer might take into account, such as unusual circumstances or specific needs of the applicant [2].", "hidden": "B"}, {"order": 22, "question_id": "Q11", "question": "I am 67. Does this system treat older applicants differently from younger ones?", "applicant": "P2", "category": "fairness", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "JA - menschliche Pruefung muss genannt werden"], ["Erwartete Quelle", "fairness_report"]], "answer": "Based on the information provided, the system does treat older applicants differently from younger ones, particularly in the context of the dataset 2 model [2].\n\nIn dataset 2, the model with age as a feature (Model B) shows a demographic parity ratio of 0.423, meaning that older applicants (aged 61+) are less likely to be approved compared to other age groups. When age is removed from the model, the demographic parity ratio increases to 0.511, indicating that older applicants are more likely to be approved [2].\n\nFor a 67-year-old applicant, the model suggests a lower likelihood of approval compared to younger applicants, as the presence of age as a feature in the model reduces the approval rate for older applicants [2].\n\nHowever, it's important to note that the model's treatment of older applicants is not guaranteed to be fair, as deferral sends cases to a human reviewer, who may not always make a fair decision [2]. Additionally, the data for older applicants is limited, so the model's performance for this group is uncertain [2].\n\nGiven the flagged status of your case [4], a human reviewer will need to assess your application individually, which means the system's recommendation is not definitive [4].", "hidden": "C"}, {"order": 23, "question_id": "Q21", "question": "My income is low relative to the amount I asked for. What do the rules say a lender should do in that situation?", "applicant": "P3", "category": "creditworthiness", "facts": [["Geschaetztes Maximum", "KEINES gefunden"], ["Fall markiert", "nein"], ["Erwartete Quelle", "eba_guidelines"]], "answer": "In situations where your income is low relative to the amount you are asking for, the rules suggest that the lender should consider your overall financial situation carefully. Specifically, the model used by the lender evaluates several factors, including your credit score, annual income, and the loan-to-income ratio. For your case, the model indicates that your annual income and loan-to-income ratio are contributing negatively to the approval likelihood [2].\n\nThe lender is required to ensure that the loan amount is affordable for you based on your income and other financial factors. If your income is significantly lower than the requested loan amount, the lender may need to reduce the loan amount to ensure that you can manage the payments [2].\n\nGiven the data from the model, there is no specific maximum loan amount that can be definitively recommended for your case. The model does not provide a clear upper limit for your loan amount, and the real maximum may be higher than the data suggests [2].\n\nIt's important to note that this is an estimate based on past decisions in the data, and it is not a guarantee. A human reviewer will need to consider your specific circumstances and make a final decision [2].\n\nIf you are concerned about the loan amount, you might want to discuss with the lender to see if they can adjust the loan term or the amount to better fit your financial situation [2].", "hidden": "B"}, {"order": 24, "question_id": "Q07", "question": "Is the amount you gave me an offer I can rely on, or could the real maximum be different?", "applicant": "P1", "category": "uncertainty", "facts": [["Geschaetztes Maximum", "28.429 (an der Obergrenze)"], ["Fall markiert", "nein"]], "answer": "The amount you were given, $25,000, is based on past decisions in the data and is an estimate. It is not a guaranteed offer, and the real maximum amount you could be approved for might be different. The data shows that the maximum loan amount is an upper limit, so the actual maximum could potentially be higher, but this information is not available from the data [2].", "hidden": "A"}], "dimensions": [{"key": "correctness_0_1_2", "label": "Korrektheit", "options": ["0 - falscher Betrag, oder behauptet einen Betrag, obwohl keiner gefunden wurde", "1 - im Kern richtig, laesst aber Wesentliches aus (Obergrenze, menschliche Pruefung)", "2 - vollstaendig richtig"]}, {"key": "clarity_0_1_2", "label": "Verstaendlichkeit", "options": ["0 - Fachjargon ohne Erklaerung, oder unverstaendlich", "1 - verstaendlich, aber umstaendlich oder lueckenhaft", "2 - klar und vollstaendig"]}]};
+const KEY = "rubrik-v1";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+
+const cards = document.getElementById("cards");
+DATA.rows.forEach(row => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.id = "card-" + row.order;
+
+  let facts = row.facts.map(([k, v]) => {
+    const warn = String(v).startsWith("JA") ? ' class="flag"' : "";
+    return `<div><b>${k}</b><span${warn}>${v}</span></div>`;
+  }).join("");
+
+  let dims = DATA.dimensions.map(d => {
+    const opts = d.options.map((text, value) =>
+      `<label><input type="radio" name="${d.key}-${row.order}" value="${value}">${text}</label>`
+    ).join("");
+    return `<div class="dim"><b>${d.label}</b>${opts}</div>`;
+  }).join("");
+
+  card.innerHTML = `
+    <div><span class="num">${row.order} von ${DATA.rows.length}</span>
+         <span class="sub"> &middot; ${row.question_id} &middot; ${row.category}
+         &middot; Antragsteller ${row.applicant}</span></div>
+    <div class="q">${row.question}</div>
+    <div class="facts">${facts}</div>
+    <div class="answer">${row.answer.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</div>
+    ${dims}
+    <div class="dim"><b>Notiz (optional)</b>
+      <textarea rows="2" id="note-${row.order}"></textarea></div>`;
+  cards.appendChild(card);
+});
+
+function restore() {
+  DATA.rows.forEach(row => {
+    const saved = state[row.order] || {};
+    DATA.dimensions.forEach(d => {
+      if (saved[d.key] !== undefined) {
+        const el = document.querySelector(`input[name="${d.key}-${row.order}"][value="${saved[d.key]}"]`);
+        if (el) el.checked = true;
+      }
+    });
+    if (saved.note) document.getElementById("note-" + row.order).value = saved.note;
+  });
+  if (state.__rater) document.getElementById("rater").value = state.__rater;
+}
+
+function collect() {
+  const out = [];
+  DATA.rows.forEach(row => {
+    const entry = { note: document.getElementById("note-" + row.order).value };
+    DATA.dimensions.forEach(d => {
+      const picked = document.querySelector(`input[name="${d.key}-${row.order}"]:checked`);
+      if (picked) entry[d.key] = Number(picked.value);
+    });
+    out.push({ row, entry });
+  });
+  return out;
+}
+
+function refresh() {
+  const all = collect();
+  let complete = 0;
+  all.forEach(({ row, entry }) => {
+    const done = DATA.dimensions.every(d => entry[d.key] !== undefined);
+    if (done) complete++;
+    document.getElementById("card-" + row.order).classList.toggle("done", done);
+    state[row.order] = entry;
+  });
+  state.__rater = document.getElementById("rater").value;
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+
+  const total = DATA.rows.length;
+  document.getElementById("status").textContent = complete + " von " + total + " bewertet";
+  document.getElementById("bar").style.width = (100 * complete / total) + "%";
+  document.getElementById("save").disabled = complete === 0;
+  document.getElementById("hint").textContent = complete < total
+    ? "Teilstand reicht - fehlende Zeilen werden beim Auswerten gemeldet."
+    : "Vollstaendig.";
+}
+
+document.addEventListener("input", refresh);
+document.addEventListener("change", refresh);
+
+document.getElementById("clear").onclick = () => {
+  if (!confirm("Alle Eingaben auf dieser Seite loeschen?")) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+};
+
+document.getElementById("save").onclick = () => {
+  const rater = document.getElementById("rater").value || "";
+  const cols = ["rating_order", "question_id", "category"]
+    .concat(DATA.dimensions.map(d => d.key))
+    .concat(["rater", "note", "configuration_hidden"]);
+  const esc = v => {
+    const s = v === undefined || v === null ? "" : String(v);
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const lines = [cols.join(",")];
+  collect().forEach(({ row, entry }) => {
+    const values = [row.order, row.question_id, row.category]
+      .concat(DATA.dimensions.map(d => entry[d.key] === undefined ? "" : entry[d.key]))
+      .concat([rater, entry.note, row.hidden]);
+    lines.push(values.map(esc).join(","));
+  });
+  const blob = new Blob(["\ufeff" + lines.join("\r\n")], {type: "text/csv;charset=utf-8"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "evaluation_rubric_filled.csv";
+  link.click();
+};
+
+restore();
+refresh();
+</script>
+</body>
+</html>
