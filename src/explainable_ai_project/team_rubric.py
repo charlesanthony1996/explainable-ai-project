@@ -502,7 +502,10 @@ def run_team_rubric(read_back=False):
     if source is None:
         print("The team's sheet is not here:", SOURCE_SHEET)
         print()
-        print("It lives on the dayas branch. Fetch it with:")
+        print("It lives on the dayas branch. The folder has to exist first,")
+        print("or the shell reports a missing path rather than a missing file:")
+        print()
+        print("  mkdir evaluation")
         print("  git show origin/dayas:evaluation/llm_scores.csv > "
               "evaluation/llm_scores.csv")
         print("  git show origin/dayas:evaluation/rubric.md > "
