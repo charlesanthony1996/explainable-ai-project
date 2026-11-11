@@ -773,6 +773,14 @@ TEXTS = {
         "flagged_yes": "YES - the answer must mention human review",
         "flagged_no": "no",
         "source": "Expected source",
+        "who": "The applicant, exactly as the system was given them",
+        "fields": {
+            "age": "Age", "dependents": "Dependants",
+            "annual_income": "Annual income", "credit_score": "Credit score",
+            "loan_amount": "Amount requested", "loan_term_months": "Term (months)",
+            "marital_status": "Marital status", "education": "Education",
+            "employment_status": "Employment", "loan_purpose": "Purpose",
+        },
         "passages": "The four passages the markers [1] to [4] refer to",
         "passages_note": "These belong to the question, not to one particular "
                          "answer. A marker in an answer that was given no "
@@ -816,6 +824,14 @@ TEXTS = {
         "flagged_yes": "JA - die Antwort muss menschliche Pruefung nennen",
         "flagged_no": "nein",
         "source": "Erwartete Quelle",
+        "who": "Der Antragsteller, genau so, wie das System ihn bekommen hat",
+        "fields": {
+            "age": "Alter", "dependents": "Angehoerige",
+            "annual_income": "Jahreseinkommen", "credit_score": "Kreditscore",
+            "loan_amount": "Beantragter Betrag", "loan_term_months": "Laufzeit (Monate)",
+            "marital_status": "Familienstand", "education": "Ausbildung",
+            "employment_status": "Beschaeftigung", "loan_purpose": "Zweck",
+        },
         "passages": "Die vier Textstellen, auf die sich [1] bis [4] beziehen",
         "passages_note": "Sie gehoeren zur Frage, nicht zu einer bestimmten "
                          "Antwort. Ein Marker in einer Antwort, die keine "
@@ -902,6 +918,15 @@ def rubric_page(sheet, path=RUBRIC_PAGE_FILE, language="en", passages=None):
             "applicant": row["applicant"],
             "category": row["category"],
             "facts": facts,
+            # The applicant's own inputs, so a claim like "your credit score
+            # of 746" can be checked against something instead of believed.
+            # A property of the question, identical across the three arms.
+            "who": [
+                (words["fields"][name],
+                 f"{value:,.0f}".replace(",", "." if language == "de" else ",")
+                 if name in ("annual_income", "loan_amount") else str(value))
+                for name, value in APPLICANTS[row["applicant"]].items()
+            ],
             "answer": row["answer"],
             "passages": passages.get(row["question_id"], []),
             "hidden": row["configuration_hidden"],
@@ -970,6 +995,16 @@ RUBRIC_PAGE_TEMPLATE = """<!doctype html>
   .passage .src { color: var(--muted); }
   .passage p { margin: 6px 0 0; white-space: pre-wrap; }
   .pnote { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+  .who { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+         gap: 2px 18px; background: #f3f6fa; border: 1px solid #d6e2f0;
+         border-radius: 8px; padding: 10px 14px; margin-bottom: 10px;
+         font-size: 14px; }
+  .who div { display: flex; justify-content: space-between; gap: 10px;
+             border-bottom: 1px dotted #d6e2f0; padding: 2px 0; }
+  .who b { color: var(--muted); font-weight: 500; }
+  .who span { font-variant-numeric: tabular-nums; }
+  .whoHead { font-size: 13px; font-weight: 600; color: var(--muted);
+             margin-bottom: 4px; }
   .dim { margin-bottom: 12px; }
   .dim > b { display: block; margin-bottom: 6px; font-size: 15px; }
   label { display: block; cursor: pointer; padding: 5px 10px; border-radius: 6px;
@@ -1052,6 +1087,9 @@ DATA.rows.forEach(row => {
          <span class="sub"> &middot; ${row.question_id} &middot; ${row.category}
          &middot; ${W.applicant} ${row.applicant}</span></div>
     <div class="q">${row.question}</div>
+    <div class="whoHead">${W.who}</div>
+    <div class="who">${row.who.map(([k, v]) =>
+      `<div><b>${esc(k)}</b><span>${esc(v)}</span></div>`).join("")}</div>
     <div class="facts">${facts}</div>
     <div class="answer">${esc(row.answer)}</div>
     <details><summary>${W.passages}</summary>
