@@ -1,0 +1,187 @@
+{
+  "record": "minimum provenance for the trustworthy loan assessment assistant",
+  "written_on": "2026-11-11",
+  "accountable": "Michael Aichinger and Charles Anthony, jointly",
+  "review": "none. The project ran for about two weeks and ends at submission; no operational owner exists afterwards and no review is scheduled. Naming a future date would imply a responsibility nobody holds. In a deployment this row would carry a named risk owner and a recurring review, and its absence here is itself a governance finding.",
+  "personal_data": "none. Both datasets are synthetic; no natural person is described, so GDPR data-subject rights do not arise. The architecture would still have to be re-examined before any real applicant data is used.",
+  "datasets": [
+    {
+      "id": "dataset_1",
+      "role": "model A, the working model for the assistant",
+      "origin": "course-supplied loan application data",
+      "synthetic": true,
+      "rows": 52000,
+      "file": "datasets/root/loan_dataset_1.csv",
+      "licence": "course material, not redistributable outside the course",
+      "consent": "not applicable - no real applicants, no personal data",
+      "known_issues": [
+        "loan_to_income capped at 0.40, which is implausibly tight for real lending and bounds what the amount sweep can find",
+        "applicants aged 61+ hold a median credit score of 438 against 757 for the 31-45 group; the age gap in the model is mediated almost entirely by this"
+      ],
+      "md5": "b14dbfd7431ea362cb5b8d02dc095dca",
+      "size_kb": 7432.5,
+      "recorded_on": "2026-11-09 11:01",
+      "step": "1 load"
+    },
+    {
+      "id": "dataset_2",
+      "role": "model B, the second opinion",
+      "origin": "public Kaggle loan dataset",
+      "synthetic": true,
+      "rows": 20000,
+      "file": "datasets/root/loan_dataset_2.csv",
+      "licence": "as published on Kaggle; verify before any use beyond this course",
+      "consent": "not applicable - no real applicants, no personal data",
+      "known_issues": [
+        "RiskScore reaches a single-feature AUC of 0.9873 and was excluded as target leakage; it looks like the quantity the label was generated from",
+        "the 61+ group holds 120 test rows, which is why four of its eight parity metrics come out undecided"
+      ],
+      "md5": "bb8daba59a03717ee817344b829f7411",
+      "size_kb": 5461.7,
+      "recorded_on": "2026-11-09 11:01",
+      "step": "1 load"
+    }
+  ],
+  "models": [
+    {
+      "id": "model_A",
+      "file": "models/rf_calibrated_dataset_1_v1.joblib",
+      "kind": "RandomForestClassifier, 400 trees, monotonic constraints on loan amount and loan-to-income, wrapped in CalibratedClassifierCV with isotonic regression",
+      "trained_on": "dataset_1, training split only",
+      "in_production": true,
+      "md5": "cf7ae1722308702c598a0c6836197664",
+      "size_kb": 32261.1,
+      "recorded_on": "2026-11-09 11:02",
+      "step": "19 calibrate"
+    },
+    {
+      "id": "model_B",
+      "file": "models/rf_calibrated_dataset_2_v1.joblib",
+      "kind": "RandomForestClassifier, 200 trees, same constraints and calibration",
+      "trained_on": "dataset_2, training split only",
+      "in_production": true,
+      "md5": "3ab38e582b04f3dbd0bc86d40c277176",
+      "size_kb": 12186.9,
+      "recorded_on": "2026-11-09 11:02",
+      "step": "19 calibrate"
+    },
+    {
+      "id": "ebm_dataset_1",
+      "file": "models/ebm_dataset_1_v1.joblib",
+      "kind": "Explainable Boosting Machine",
+      "trained_on": "dataset_1, training split only",
+      "in_production": false,
+      "note": "more accurate than model A on both datasets and NOT chosen: the random forest takes monotonic constraints and TreeSHAP computes exactly on it. The trade is deliberate and documented in the model card.",
+      "md5": "aa305c4925fd00c938525350ef64e5e3",
+      "size_kb": 547.8,
+      "recorded_on": "2026-11-09 11:02",
+      "step": "18 EBM"
+    }
+  ],
+  "language_model": {
+    "id": "qwen2.5:7b-instruct",
+    "runs": "locally through Ollama on 127.0.0.1, never over the network",
+    "weights": "downloaded from the Ollama registry, not fine-tuned",
+    "settings": {
+      "temperature": 0.0,
+      "seed": 42,
+      "num_ctx": 8192
+    },
+    "role": "wording only - it is given every figure it may state and is checked against that list afterwards; it never computes one",
+    "data_sent_to_third_parties": "none"
+  },
+  "knowledge_base": [
+    {
+      "id": "eba_guidelines",
+      "kind": "external",
+      "title": "EBA Guidelines on loan origination and monitoring (EBA/GL/2020/06)",
+      "source": "https://www.eba.europa.eu/regulation-and-policy/credit-risk/guidelines-on-loan-origination-and-monitoring",
+      "md5": "1acc6353b8dd71f63615082f1de9805b",
+      "checked_on": "2026-11-09 11:03"
+    },
+    {
+      "id": "eu_ai_act",
+      "kind": "external",
+      "title": "EU Artificial Intelligence Act, Regulation (EU) 2024/1689",
+      "source": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+      "md5": "e106a95b7b9be33e299551ccf51c13be",
+      "checked_on": "2026-11-09 11:03"
+    },
+    {
+      "id": "datasheet",
+      "kind": "project",
+      "title": "Datasheet of the two loan datasets",
+      "source": "docs/datasheet.md (step 11)",
+      "md5": "de6f7e0ea02f5a5a8c1153324c598c8c",
+      "checked_on": "2026-11-09 11:03"
+    },
+    {
+      "id": "data_quality",
+      "kind": "project",
+      "title": "Data quality report",
+      "source": "docs/data_quality.md (step 11)",
+      "md5": "dddfdcba91666d6e1d75f12bff4def20",
+      "checked_on": "2026-11-09 11:03"
+    },
+    {
+      "id": "model_card",
+      "kind": "project",
+      "title": "Model card of models A and B",
+      "source": "docs/model_card.md (step 23)",
+      "md5": "ed17dd79049c85a2afd387e1b09ce9c5",
+      "checked_on": "2026-11-09 11:03"
+    },
+    {
+      "id": "fairness_report",
+      "kind": "project",
+      "title": "Fairness report",
+      "source": "docs/fairness_report.md (step 29)",
+      "md5": "8e20920e38ec716b2f8b01eb152c1fc8",
+      "checked_on": "2026-11-09 11:03"
+    },
+    {
+      "id": "feature_glossary",
+      "kind": "project",
+      "title": "Feature glossary",
+      "source": "written by step 30",
+      "md5": "923b21da21d0a0b4ac0d3e3dd3ab35e8",
+      "checked_on": "2026-11-09 11:03"
+    }
+  ],
+  "generated_documents": {
+    "model_card.md": {
+      "md5": "ed17dd79049c85a2afd387e1b09ce9c5",
+      "present": true,
+      "indexed_for_retrieval": true
+    },
+    "datasheet.md": {
+      "md5": "de6f7e0ea02f5a5a8c1153324c598c8c",
+      "present": true,
+      "indexed_for_retrieval": true
+    },
+    "data_quality.md": {
+      "md5": "dddfdcba91666d6e1d75f12bff4def20",
+      "present": true,
+      "indexed_for_retrieval": true
+    },
+    "fairness_report.md": {
+      "md5": "8e20920e38ec716b2f8b01eb152c1fc8",
+      "present": true,
+      "indexed_for_retrieval": true
+    }
+  },
+  "hash_log": {
+    "file": "results/governance_log.csv",
+    "entries": 32,
+    "covers": "every data and model file written by the pipeline"
+  },
+  "reproduce": {
+    "command": "uv run main.py train",
+    "seed": 42,
+    "split": "70 / 15 / 15, stratified by approval and age group",
+    "not_reproducible": [
+      "isotonic calibration resampling is not seeded, so parity figures move in the third decimal between runs",
+      "the language model is deterministic only while it stays loaded; a cold start changes the answer"
+    ]
+  }
+}

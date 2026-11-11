@@ -189,6 +189,18 @@ def stage_evaluate(reuse_answers=False):
     return run_evaluation(reuse_answers=reuse_answers)
 
 
+def stage_zones():
+    from explainable_ai_project.human_control import run_zones
+
+    return run_zones()
+
+
+def stage_provenance():
+    from explainable_ai_project.provenance import run_provenance
+
+    return run_provenance()
+
+
 def stage_verify_fairness():
     from explainable_ai_project.fairness_verification import run_fairness_verification
 
@@ -224,6 +236,8 @@ STAGES = {
     "counterfactual": stage_counterfactual,
     "rubric": stage_rubric,
     "verify_fairness": stage_verify_fairness,
+    "provenance": stage_provenance,
+    "zones": stage_zones,
 }
 
 

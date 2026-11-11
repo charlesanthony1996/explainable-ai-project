@@ -1,0 +1,9 @@
+dataset,zone,cases,share,reaching_a_person,mean_p_approve,really_approved_share
+dataset_1,auto-accept,5156,0.661,0,0.8532,0.8468
+dataset_1,sample audit,1648,0.2113,165,0.1535,0.1414
+dataset_1,human review,68,0.0087,68,0.7765,0.7941
+dataset_1,safe-stop,928,0.119,928,0.3669,0.3793
+dataset_2,auto-accept,224,0.0747,0,0.9413,0.9107
+dataset_2,sample audit,2445,0.815,244,0.1295,0.1333
+dataset_2,human review,173,0.0577,173,0.7765,0.7399
+dataset_2,safe-stop,158,0.0527,158,0.4007,0.3797
