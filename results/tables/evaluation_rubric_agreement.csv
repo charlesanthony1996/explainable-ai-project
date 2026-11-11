@@ -1,0 +1,3 @@
+dimension,rater_1,rater_2,answers_both_rated,exact_agreement,within_one_point,kappa,kappa_quadratic
+correctness,Aichinger Michael,charles,24,0.25,0.75,-0.043,0.027
+clarity,Aichinger Michael,charles,24,0.375,0.875,-0.088,0.074

@@ -1,4 +1,4 @@
 configuration,raters,answers_scored,mean_correctness,share_full_marks_correctness,mean_clarity,share_full_marks_clarity,mean_total_of_4
-A,1,8,1.375,0.5,1.75,0.75,3.125
-B,1,8,2.0,1.0,1.25,0.625,3.25
-C,1,8,1.875,0.875,1.375,0.625,3.25
+A,2,8,1.062,0.0,1.812,0.625,2.875
+B,2,8,1.5,0.25,1.188,0.25,2.688
+C,2,8,1.438,0.25,1.375,0.25,2.812

@@ -1223,7 +1223,11 @@ def find_filled_sheets():
     if the same rater appears twice, the newer file wins.
     """
 
-    patterns = ["evaluation_rubric_filled*.csv"]
+    # Both formats. The page hands out a CSV, but a rater who opens it in
+    # Excel and saves from there gets an .xlsx, which is a reasonable thing
+    # to do and should not quietly produce "no scored sheet found".
+    patterns = ["evaluation_rubric_filled*.csv",
+                "evaluation_rubric_filled*.xlsx"]
     places = [TABLES_FOLDER, Path.home() / "Downloads"]
 
     found = []
@@ -1241,6 +1245,30 @@ def find_filled_sheets():
     return sorted(by_name.values(), key=lambda one: one.stat().st_mtime)
 
 
+def unwrap_single_column(frame):
+    """Undo the German Excel round trip.
+
+    A comma-separated file opened in an Excel set to semicolons lands in a
+    single column, and saving from there keeps it that way: one cell per
+    row, with the header as the column name. The data is all present, so
+    refusing the file would be pedantry - it is re-split here instead.
+
+    Recognised by the shape, not by the filename: exactly one column whose
+    name contains commas.
+    """
+
+    if len(frame.columns) != 1 or "," not in str(frame.columns[0]):
+        return frame
+
+    import io
+
+    lines = [str(frame.columns[0])]
+    lines.extend(str(value) for value in frame.iloc[:, 0].tolist())
+    repaired = pd.read_csv(io.StringIO("\n".join(lines)))
+    print("  (repaired a sheet that Excel had collapsed into one column)")
+    return repaired
+
+
 def read_rubric(path=None):
     """Load every scored sheet and check them before anything is computed."""
 
@@ -1251,7 +1279,9 @@ def read_rubric(path=None):
 
     parts = []
     for one in paths:
-        part = pd.read_csv(one)
+        part = (pd.read_excel(one) if one.suffix.lower() == ".xlsx"
+                else pd.read_csv(one))
+        part = unwrap_single_column(part)
         print("Reading:", one, "-", len(part), "rows")
         if "rater" not in part.columns or part["rater"].isna().all():
             part["rater"] = one.stem.replace("evaluation_rubric_filled_", "")

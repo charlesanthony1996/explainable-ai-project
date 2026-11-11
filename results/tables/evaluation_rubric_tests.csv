@@ -1,7 +1,7 @@
 outcome,comparison,questions,pairs,both_right,both_wrong,b_first_wrong_second_right,c_first_right_second_wrong,discordant_pairs,p_value_exact,verdict
-correctness_full,A vs C,all,8,3,0,4,1,5,0.375,not significant at 0.05
-correctness_full,A vs B,all,8,4,0,4,0,4,0.125,not significant at 0.05
-correctness_full,B vs C,all,8,7,0,0,1,1,1.0,not significant at 0.05
-clarity_full,A vs C,all,8,4,1,1,2,3,1.0,not significant at 0.05
-clarity_full,A vs B,all,8,4,1,1,2,3,1.0,not significant at 0.05
-clarity_full,B vs C,all,8,4,2,1,1,2,1.0,not significant at 0.05
+correctness_full,A vs C,all,8,0,6,2,0,2,0.5,not significant at 0.05
+correctness_full,A vs B,all,8,0,6,2,0,2,0.5,not significant at 0.05
+correctness_full,B vs C,all,8,1,5,1,1,2,1.0,not significant at 0.05
+clarity_full,A vs C,all,8,1,2,1,4,5,0.375,not significant at 0.05
+clarity_full,A vs B,all,8,1,2,1,4,5,0.375,not significant at 0.05
+clarity_full,B vs C,all,8,1,5,1,1,2,1.0,not significant at 0.05

@@ -2,3 +2,6 @@ rater,configuration,answers_scored,mean_correctness,share_full_marks_correctness
 Aichinger Michael,A,8,1.375,0.5,1.75,0.75,3.125
 Aichinger Michael,B,8,2.0,1.0,1.25,0.625,3.25
 Aichinger Michael,C,8,1.875,0.875,1.375,0.625,3.25
+charles,A,8,0.75,0.125,1.875,0.875,2.625
+charles,B,8,1.0,0.25,1.125,0.375,2.125
+charles,C,8,1.0,0.375,1.375,0.375,2.375
