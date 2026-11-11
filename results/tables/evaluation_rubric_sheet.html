@@ -228,7 +228,12 @@ document.getElementById("save").onclick = () => {
   const blob = new Blob(["\ufeff" + lines.join("\r\n")], {type: "text/csv;charset=utf-8"});
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "evaluation_rubric_filled.csv";
+  // The rater's name goes in the filename. Two people downloading
+  // "evaluation_rubric_filled.csv" would silently overwrite each other, and
+  // the second rating exists precisely to be compared with the first.
+  const tag = rater.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-|-$/g, "") || "rater";
+  link.download = "evaluation_rubric_filled_" + tag + ".csv";
   link.click();
 };
 

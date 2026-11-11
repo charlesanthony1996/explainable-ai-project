@@ -1181,7 +1181,12 @@ document.getElementById("save").onclick = () => {
   const blob = new Blob(["\\ufeff" + lines.join("\\r\\n")], {type: "text/csv;charset=utf-8"});
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "evaluation_rubric_filled.csv";
+  // The rater's name goes in the filename. Two people downloading
+  // "evaluation_rubric_filled.csv" would silently overwrite each other, and
+  // the second rating exists precisely to be compared with the first.
+  const tag = rater.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-|-$/g, "") || "rater";
+  link.download = "evaluation_rubric_filled_" + tag + ".csv";
   link.click();
 };
 
@@ -1201,6 +1206,8 @@ ALL_RUBRIC_SCORES = ["correctness_0_1_2", "faithfulness_0_1_2", "clarity_0_1_2"]
 RUBRIC_FILLED_FILE = TABLES_FOLDER / "evaluation_rubric_filled.csv"
 RUBRIC_RESULT_FILE = TABLES_FOLDER / "evaluation_rubric_results.csv"
 RUBRIC_TESTS_FILE = TABLES_FOLDER / "evaluation_rubric_tests.csv"
+RUBRIC_PER_RATER_FILE = TABLES_FOLDER / "evaluation_rubric_per_rater.csv"
+RUBRIC_AGREEMENT_FILE = TABLES_FOLDER / "evaluation_rubric_agreement.csv"
 
 
 def scores_present(sheet):
@@ -1208,32 +1215,61 @@ def scores_present(sheet):
     return [name for name in ALL_RUBRIC_SCORES if name in sheet.columns]
 
 
-def find_filled_sheet(path=RUBRIC_FILLED_FILE):
-    """Where the scored sheet is, including where the browser put it.
+def find_filled_sheets():
+    """Every scored sheet, from the tables folder and from Downloads.
 
-    The page downloads the file, and a browser downloads to Downloads. Asking
-    someone to move it first is one more step to forget, so the usual places
-    are checked and the one that is used is named.
+    The page names each download after the rater, so a second rater's file
+    sits beside the first instead of replacing it. Both are picked up here;
+    if the same rater appears twice, the newer file wins.
     """
 
-    candidates = [path, Path.home() / "Downloads" / path.name,
-                  Path.home() / "Downloads" / "evaluation_rubric_filled.csv"]
-    found = [one for one in candidates if one.exists()]
-    if not found:
-        return None
-    return max(found, key=lambda one: one.stat().st_mtime)
+    patterns = ["evaluation_rubric_filled*.csv"]
+    places = [TABLES_FOLDER, Path.home() / "Downloads"]
+
+    found = []
+    for place in places:
+        if not place.is_dir():
+            continue
+        for pattern in patterns:
+            found.extend(place.glob(pattern))
+
+    by_name = {}
+    for path in sorted(found, key=lambda one: one.stat().st_mtime):
+        by_name[path.name] = path        # later file of the same name wins
+    # Oldest first, so that a later rating of the same answer by the same
+    # person replaces an earlier one further down.
+    return sorted(by_name.values(), key=lambda one: one.stat().st_mtime)
 
 
-def read_rubric(path=RUBRIC_FILLED_FILE):
-    """Load the scored sheet and check it before anything is computed."""
+def read_rubric(path=None):
+    """Load every scored sheet and check them before anything is computed."""
 
-    path = find_filled_sheet(path) or path
-    if not path.exists():
-        return None, ["No scored sheet at " + str(path)
+    paths = [path] if path is not None else find_filled_sheets()
+    if not paths:
+        return None, ["No scored sheet in " + str(TABLES_FOLDER)
                       + " and none in the Downloads folder"]
-    print("Reading:", path)
 
-    sheet = pd.read_csv(path)
+    parts = []
+    for one in paths:
+        part = pd.read_csv(one)
+        print("Reading:", one, "-", len(part), "rows")
+        if "rater" not in part.columns or part["rater"].isna().all():
+            part["rater"] = one.stem.replace("evaluation_rubric_filled_", "")
+        part["source_file"] = one.name
+        parts.append(part)
+
+    sheet = pd.concat(parts, ignore_index=True)
+
+    # One rating per person per answer. A second download by the same person
+    # - the copy still sitting in Downloads, a corrected re-rating - would
+    # otherwise be averaged in as if it were a second opinion.
+    before = len(sheet)
+    sheet = sheet.drop_duplicates(
+        subset=["rater", "question_id", "configuration_hidden"], keep="last")
+    if len(sheet) < before:
+        print("  (ignored", before - len(sheet),
+              "repeated ratings of the same answer by the same person)")
+
     problems = []
 
     for column in ["configuration_hidden", "question_id"]:
@@ -1260,28 +1296,15 @@ def read_rubric(path=RUBRIC_FILLED_FILE):
     return sheet, problems
 
 
-def analyse_rubric(path=RUBRIC_FILLED_FILE):
-    """Mean score per configuration, plus the paired tests.
+def summarise_scores(scored, columns, label_column=None):
+    """Mean and share of full marks per configuration, optionally per rater."""
 
-    The paired test treats a score as 'good' when it is 2. Using the mean
-    alone would hide which answers moved; using the pairing shows it, and it
-    is the same exact binomial as everywhere else in this file.
-    """
-
-    sheet, problems = read_rubric(path)
-    if sheet is None:
-        return None, None, problems
-
-    columns = scores_present(sheet)
-    sheet = sheet.rename(columns={"configuration_hidden": "configuration"})
-    scored = sheet.dropna(subset=columns)
-
+    keys = ([label_column] if label_column else []) + ["configuration"]
     rows = []
-    for configuration in CONFIGURATIONS:
-        part = scored[scored["configuration"] == configuration]
-        if part.empty:
-            continue
-        row = {"configuration": configuration, "answers_scored": len(part)}
+    for key, part in scored.groupby(keys, dropna=False):
+        key = key if isinstance(key, tuple) else (key,)
+        row = dict(zip(keys, key))
+        row["answers_scored"] = len(part)
         for column in columns:
             short = column.replace("_0_1_2", "")
             row["mean_" + short] = round(part[column].mean(), 3)
@@ -1289,33 +1312,109 @@ def analyse_rubric(path=RUBRIC_FILLED_FILE):
         row["mean_total_of_" + str(2 * len(columns))] = round(
             part[columns].sum(axis=1).mean(), 3)
         rows.append(row)
-    summary = pd.DataFrame(rows)
+    return pd.DataFrame(rows)
+
+
+def agreement_between(scored, columns):
+    """How far the raters agree, where there are at least two of them.
+
+    Cohen's kappa is reported both unweighted and quadratically weighted.
+    The scores are ordinal, so the weighted form is the one to quote: it
+    counts a 0-against-2 disagreement as worse than a 1-against-2, which
+    plain kappa does not. Raw agreement is shown beside it because kappa on
+    a skewed distribution can look poor while the raters in fact rarely
+    differ.
+    """
+
+    from sklearn.metrics import cohen_kappa_score
+
+    raters = sorted(scored["rater"].dropna().unique())
+    if len(raters) < 2:
+        return pd.DataFrame(), raters
+
+    rows = []
+    for first, second in [(a, b) for i, a in enumerate(raters)
+                          for b in raters[i + 1:]]:
+        left = scored[scored["rater"] == first].set_index(
+            ["question_id", "configuration"])
+        right = scored[scored["rater"] == second].set_index(
+            ["question_id", "configuration"])
+        shared = left.index.intersection(right.index)
+        if len(shared) == 0:
+            continue
+        for column in columns:
+            one = left.loc[shared, column].astype(int)
+            two = right.loc[shared, column].astype(int)
+            rows.append({
+                "dimension": column.replace("_0_1_2", ""),
+                "rater_1": first,
+                "rater_2": second,
+                "answers_both_rated": len(shared),
+                "exact_agreement": round(float((one == two).mean()), 3),
+                "within_one_point": round(float((abs(one - two) <= 1).mean()), 3),
+                "kappa": round(float(cohen_kappa_score(one, two)), 3),
+                "kappa_quadratic": round(
+                    float(cohen_kappa_score(one, two, weights="quadratic")), 3),
+            })
+    return pd.DataFrame(rows), raters
+
+
+def analyse_rubric(path=None):
+    """Scores per configuration, the paired tests, and rater agreement.
+
+    With more than one rater the paired test runs on the CONSENSUS: the mean
+    of the raters for each answer, with full marks meaning every rater gave a
+    2. Pooling the individual ratings instead would double the row count
+    without doubling the information, because both raters score the same
+    answers, and would make the test look more certain than it is.
+    """
+
+    sheet, problems = read_rubric(path)
+    if sheet is None:
+        return None, None, None, problems
+
+    columns = scores_present(sheet)
+    sheet = sheet.rename(columns={"configuration_hidden": "configuration"})
+    scored = sheet.dropna(subset=columns)
+
+    per_rater = summarise_scores(scored, columns, label_column="rater")
+    agreement, raters = agreement_between(scored, columns)
+
+    consensus = (scored.groupby(["question_id", "configuration"], as_index=False)
+                 [columns].mean())
+    summary = summarise_scores(consensus, columns)
+    summary.insert(1, "raters", len(raters) if raters else 1)
 
     tests = []
     for column in columns:
         short = column.replace("_0_1_2", "")
-        marked = scored.copy()
+        marked = consensus.copy()
+        # Full marks only when every rater gave a 2, so a split verdict does
+        # not quietly count as the best possible answer.
         marked[short + "_full"] = marked[column] == 2
         for first, second in [("A", "C"), ("A", "B"), ("B", "C")]:
             tests.append(mcnemar(marked, first, second, short + "_full"))
     tests = pd.DataFrame(tests)
 
-    return summary, tests, problems
+    return summary, tests, (per_rater, agreement), problems
 
 
 def run_rubric_analysis():
     """main.py rubric - read the scored sheet and report."""
 
-    summary, tests, problems = analyse_rubric()
+    summary, tests, extra, problems = analyse_rubric()
 
     if summary is None:
         print("Nothing to analyse yet.")
         for problem in problems:
             print("  -", problem)
         print()
-        print("Fill in", RUBRIC_FILE.name, "and save it as",
-              RUBRIC_FILLED_FILE.name, "in the same folder.")
+        print("Open", RUBRIC_PAGE_FILE.name, "in a browser, rate the answers,")
+        print("and press the download button. The file is picked up from the")
+        print("tables folder or from Downloads.")
         return 1
+
+    per_rater, agreement = extra
 
     if problems:
         print("Warnings - the numbers below use only the scored rows:")
@@ -1332,14 +1431,35 @@ def run_rubric_analysis():
     print("-" * 70)
     print(summary.to_string(index=False))
 
+    if len(per_rater) and per_rater["rater"].nunique() > 1:
+        print()
+        print("-" * 70)
+        print("PER RATER")
+        print("-" * 70)
+        print(per_rater.to_string(index=False))
+
+    if len(agreement):
+        print()
+        print("-" * 70)
+        print("AGREEMENT BETWEEN RATERS")
+        print("-" * 70)
+        print(agreement.to_string(index=False))
+        agreement.to_csv(RUBRIC_AGREEMENT_FILE, index=False)
+
     print()
     print("-" * 70)
-    print("PAIRED TESTS (full marks = 2)")
+    print("PAIRED TESTS (full marks = every rater gave a 2)")
     print("-" * 70)
     print(tests.to_string(index=False))
 
     print()
-    for path in [RUBRIC_RESULT_FILE, RUBRIC_TESTS_FILE]:
+    written = [RUBRIC_RESULT_FILE, RUBRIC_TESTS_FILE]
+    if len(agreement):
+        written.append(RUBRIC_AGREEMENT_FILE)
+    if len(per_rater):
+        per_rater.to_csv(RUBRIC_PER_RATER_FILE, index=False)
+        written.append(RUBRIC_PER_RATER_FILE)
+    for path in written:
         print("  written:", path.relative_to(PROJECT_ROOT))
 
     return 0

@@ -1,0 +1,4 @@
+rater,configuration,answers_scored,mean_correctness,share_full_marks_correctness,mean_clarity,share_full_marks_clarity,mean_total_of_4
+Aichinger Michael,A,8,1.375,0.5,1.75,0.75,3.125
+Aichinger Michael,B,8,2.0,1.0,1.25,0.625,3.25
+Aichinger Michael,C,8,1.875,0.875,1.375,0.625,3.25
