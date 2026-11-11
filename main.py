@@ -189,6 +189,12 @@ def stage_evaluate(reuse_answers=False):
     return run_evaluation(reuse_answers=reuse_answers)
 
 
+def stage_rubric():
+    from explainable_ai_project.evaluation import run_rubric_analysis
+
+    return run_rubric_analysis()
+
+
 # ------------------------------------------------------------------
 # Topic 3 after the LLM, check 9: counterfactual age pairs
 # ------------------------------------------------------------------
@@ -210,6 +216,7 @@ STAGES = {
     "ask": stage_ask,
     "evaluate": stage_evaluate,
     "counterfactual": stage_counterfactual,
+    "rubric": stage_rubric,
 }
 
 

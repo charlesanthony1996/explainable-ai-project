@@ -647,10 +647,21 @@ def rubric_template(answers):
     nothing. Those three are scored 0 / 1 / 2 by hand. The sheet is shuffled
     and the configuration is withheld so the rater cannot score the arm
     instead of the answer.
+
+    The reference facts travel with each row. Without them correctness is not
+    ratable at all - nobody can say whether an answer states the maximum
+    correctly while having to look it up in another file for all 72 rows. The
+    facts are identical across the three arms of a question, so carrying them
+    reveals nothing about which arm produced the answer.
     """
 
+    question_text = {question["id"]: question["text"] for question in QUESTIONS}
+
     sheet = answers[["question_id", "configuration", "category",
-                     "needs_source", "answer"]].copy()
+                     "needs_source", "expected_document", "applicant",
+                     "estimated_maximum", "max_is_upper_limit",
+                     "no_amount_found", "deferral_flagged", "answer"]].copy()
+    sheet.insert(1, "question", sheet["question_id"].map(question_text))
 
     # Fixed seed: the rating sheet must be reproducible, so a second rater
     # scores the rows in the same order as the first.
@@ -667,7 +678,133 @@ def rubric_template(answers):
     sheet["rater"] = ""
     sheet["note"] = ""
 
-    return sheet
+    # Last, after the score columns, so it is off the screen while rating.
+    # Asking someone not to look at a column in the middle of the sheet does
+    # not work, and a rater who knows the arm scores the arm.
+    order = [name for name in sheet.columns if name != "configuration_hidden"]
+    return sheet[order + ["configuration_hidden"]]
+
+
+# ------------------------------------------------------------------
+# Reading the filled-in sheet back
+# ------------------------------------------------------------------
+
+RUBRIC_SCORES = ["correctness_0_1_2", "faithfulness_0_1_2", "clarity_0_1_2"]
+RUBRIC_FILLED_FILE = TABLES_FOLDER / "evaluation_rubric_filled.csv"
+RUBRIC_RESULT_FILE = TABLES_FOLDER / "evaluation_rubric_results.csv"
+RUBRIC_TESTS_FILE = TABLES_FOLDER / "evaluation_rubric_tests.csv"
+
+
+def read_rubric(path=RUBRIC_FILLED_FILE):
+    """Load the scored sheet and check it before anything is computed."""
+
+    if not path.exists():
+        return None, ["No scored sheet at " + str(path)]
+
+    sheet = pd.read_csv(path)
+    problems = []
+
+    for column in RUBRIC_SCORES + ["configuration_hidden", "question_id"]:
+        if column not in sheet.columns:
+            problems.append("Missing column: " + column)
+    if problems:
+        return None, problems
+
+    for column in RUBRIC_SCORES:
+        sheet[column] = pd.to_numeric(sheet[column], errors="coerce")
+        missing = int(sheet[column].isna().sum())
+        if missing:
+            problems.append(str(missing) + " of " + str(len(sheet))
+                            + " rows have no score in " + column)
+        outside = sheet[~sheet[column].isin([0, 1, 2]) & sheet[column].notna()]
+        if len(outside):
+            problems.append(str(len(outside)) + " rows in " + column
+                            + " are not 0, 1 or 2")
+
+    return sheet, problems
+
+
+def analyse_rubric(path=RUBRIC_FILLED_FILE):
+    """Mean score per configuration, plus the paired tests.
+
+    The paired test treats a score as 'good' when it is 2. Using the mean
+    alone would hide which answers moved; using the pairing shows it, and it
+    is the same exact binomial as everywhere else in this file.
+    """
+
+    sheet, problems = read_rubric(path)
+    if sheet is None:
+        return None, None, problems
+
+    sheet = sheet.rename(columns={"configuration_hidden": "configuration"})
+    scored = sheet.dropna(subset=RUBRIC_SCORES)
+
+    rows = []
+    for configuration in CONFIGURATIONS:
+        part = scored[scored["configuration"] == configuration]
+        if part.empty:
+            continue
+        row = {"configuration": configuration, "answers_scored": len(part)}
+        for column in RUBRIC_SCORES:
+            short = column.replace("_0_1_2", "")
+            row["mean_" + short] = round(part[column].mean(), 3)
+            row["share_full_marks_" + short] = round((part[column] == 2).mean(), 3)
+        row["mean_total_of_6"] = round(part[RUBRIC_SCORES].sum(axis=1).mean(), 3)
+        rows.append(row)
+    summary = pd.DataFrame(rows)
+
+    tests = []
+    for column in RUBRIC_SCORES:
+        short = column.replace("_0_1_2", "")
+        marked = scored.copy()
+        marked[short + "_full"] = marked[column] == 2
+        for first, second in [("A", "C"), ("A", "B"), ("B", "C")]:
+            tests.append(mcnemar(marked, first, second, short + "_full"))
+    tests = pd.DataFrame(tests)
+
+    return summary, tests, problems
+
+
+def run_rubric_analysis():
+    """main.py rubric - read the scored sheet and report."""
+
+    summary, tests, problems = analyse_rubric()
+
+    if summary is None:
+        print("Nothing to analyse yet.")
+        for problem in problems:
+            print("  -", problem)
+        print()
+        print("Fill in", RUBRIC_FILE.name, "and save it as",
+              RUBRIC_FILLED_FILE.name, "in the same folder.")
+        return 1
+
+    if problems:
+        print("Warnings - the numbers below use only the scored rows:")
+        for problem in problems:
+            print("  -", problem)
+        print()
+
+    TABLES_FOLDER.mkdir(parents=True, exist_ok=True)
+    summary.to_csv(RUBRIC_RESULT_FILE, index=False)
+    tests.to_csv(RUBRIC_TESTS_FILE, index=False)
+
+    print("-" * 70)
+    print("RUBRIC PER CONFIGURATION")
+    print("-" * 70)
+    print(summary.to_string(index=False))
+
+    print()
+    print("-" * 70)
+    print("PAIRED TESTS (full marks = 2)")
+    print("-" * 70)
+    print(tests.to_string(index=False))
+
+    print()
+    for path in [RUBRIC_RESULT_FILE, RUBRIC_TESTS_FILE]:
+        print("  written:", path.relative_to(PROJECT_ROOT))
+
+    return 0
 
 
 # ------------------------------------------------------------------
