@@ -24,6 +24,14 @@ half-written models.
 | Evaluation: `uv run main.py evaluate` | 45 questions, 7 applicants, runs A/B/C |
 | All six Topic 3 checks | zero-shot, SHAP vs LIME, age pairs, privacy, deferral compliance, prompt intervention |
 
+| From `dina` | |
+|---|---|
+| `uv run main.py results` | the results layer on top of the evaluation: comparison with bootstrap intervals, and figures for the runs, the categories, zero-shot, SHAP vs LIME and the prompt intervention |
+| `evaluation/example_figures/` | her five figures as she produced them |
+
+Her edit to `evaluation.py` only removed its docstring, so that file stays
+as Dayas wrote it. Everything else of hers is here unchanged.
+
 | From `michael` | |
 |---|---|
 | `uv run main.py verify_fairness` | parity metrics with bootstrap confidence intervals, and the definitions written down: protected group, favourable outcome, reference population, tolerance and where each tolerance comes from |

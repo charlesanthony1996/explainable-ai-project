@@ -180,11 +180,20 @@ def team_rubric(arguments):
     return run_team_rubric(read_back="--read" in arguments)
 
 
+def results():
+    # Dina's results layer: reads what the evaluation wrote and draws the
+    # comparison figures. Added as it stands; her edit to evaluation.py only
+    # removed its docstring, so that file stays as Dayas wrote it.
+    from explainable_ai_project.evaluation_results import make_results
+    return make_results()
+
+
 EXTRA_COMMANDS = {
     "verify_fairness": verify_fairness,   # parity with bootstrap intervals
     "zones": zones,                       # the four human-control zones
     "provenance": provenance,             # provenance record + governance decision
     "overview": overview,                 # the three overview diagrams
+    "results": results,                   # evaluation figures and comparison
 }
 
 
