@@ -639,7 +639,42 @@ def paired_tests(answers):
 # The part a machine cannot judge
 # ------------------------------------------------------------------
 
-def rubric_template(answers):
+# The subsample that is actually rated by hand, and the dimensions asked for.
+#
+# Rating all 72 answers on three dimensions takes about two hours, which is
+# not available the day before the deadline, and a sheet filled in a hurry is
+# worse than a smaller one filled carefully. So eight of the 24 questions are
+# rated across all three arms: 24 answers, 8 pairs per comparison. The pairing
+# survives, the power is low, and that is stated rather than hidden.
+#
+# The eight are picked by hand, not at random, to cover:
+#   - eight of the nine question categories
+#   - all four applicants
+#   - four questions that need a source and four that do not
+#   - both flagged cases, so deferral behaviour is in the sample
+#
+# FAITHFULNESS IS DELIBERATELY NOT RATED. Judging whether a claim about the
+# AI Act is true means checking it against the source document, question by
+# question; that is a different job from reading an answer, and it is the one
+# dimension where the rater would need domain knowledge. The automatic
+# citation check covers the neighbouring question of whether a source was
+# named at all. The omission belongs in the limitations of the report.
+
+RUBRIC_QUESTIONS = [
+    "Q02",   # maximum          P2   no source   no amount found
+    "Q06",   # features         P4   no source
+    "Q07",   # uncertainty      P1   no source   maximum at the upper limit
+    "Q10",   # metrics          P4   model_card
+    "Q11",   # fairness         P2   fairness_report    FLAGGED
+    "Q17",   # regulation       P3   eu_ai_act
+    "Q21",   # creditworthiness P3   eba_guidelines
+    "Q24",   # should_decline   P2   no source          FLAGGED
+]
+
+RUBRIC_DIMENSIONS = ["correctness_0_1_2", "clarity_0_1_2"]
+
+
+def rubric_template(answers, question_ids=None, dimensions=None):
     """An empty scoring sheet, one row per answer, for the human rating.
 
     Correctness, faithfulness and clarity cannot be checked against the
@@ -655,7 +690,14 @@ def rubric_template(answers):
     reveals nothing about which arm produced the answer.
     """
 
+    if question_ids is None:
+        question_ids = RUBRIC_QUESTIONS
+    if dimensions is None:
+        dimensions = RUBRIC_DIMENSIONS
+
     question_text = {question["id"]: question["text"] for question in QUESTIONS}
+
+    answers = answers[answers["question_id"].isin(question_ids)]
 
     sheet = answers[["question_id", "configuration", "category",
                      "needs_source", "expected_document", "applicant",
@@ -672,9 +714,8 @@ def rubric_template(answers):
     # the rating is finished.
     sheet = sheet.rename(columns={"configuration": "configuration_hidden"})
 
-    sheet["correctness_0_1_2"] = ""
-    sheet["faithfulness_0_1_2"] = ""
-    sheet["clarity_0_1_2"] = ""
+    for dimension in dimensions:
+        sheet[dimension] = ""
     sheet["rater"] = ""
     sheet["note"] = ""
 
@@ -689,10 +730,15 @@ def rubric_template(answers):
 # Reading the filled-in sheet back
 # ------------------------------------------------------------------
 
-RUBRIC_SCORES = ["correctness_0_1_2", "faithfulness_0_1_2", "clarity_0_1_2"]
+ALL_RUBRIC_SCORES = ["correctness_0_1_2", "faithfulness_0_1_2", "clarity_0_1_2"]
 RUBRIC_FILLED_FILE = TABLES_FOLDER / "evaluation_rubric_filled.csv"
 RUBRIC_RESULT_FILE = TABLES_FOLDER / "evaluation_rubric_results.csv"
 RUBRIC_TESTS_FILE = TABLES_FOLDER / "evaluation_rubric_tests.csv"
+
+
+def scores_present(sheet):
+    """Which of the three dimensions this sheet actually asks for."""
+    return [name for name in ALL_RUBRIC_SCORES if name in sheet.columns]
 
 
 def read_rubric(path=RUBRIC_FILLED_FILE):
@@ -704,13 +750,17 @@ def read_rubric(path=RUBRIC_FILLED_FILE):
     sheet = pd.read_csv(path)
     problems = []
 
-    for column in RUBRIC_SCORES + ["configuration_hidden", "question_id"]:
+    for column in ["configuration_hidden", "question_id"]:
         if column not in sheet.columns:
             problems.append("Missing column: " + column)
     if problems:
         return None, problems
 
-    for column in RUBRIC_SCORES:
+    columns = scores_present(sheet)
+    if not columns:
+        return None, ["The sheet has none of " + ", ".join(ALL_RUBRIC_SCORES)]
+
+    for column in columns:
         sheet[column] = pd.to_numeric(sheet[column], errors="coerce")
         missing = int(sheet[column].isna().sum())
         if missing:
@@ -736,8 +786,9 @@ def analyse_rubric(path=RUBRIC_FILLED_FILE):
     if sheet is None:
         return None, None, problems
 
+    columns = scores_present(sheet)
     sheet = sheet.rename(columns={"configuration_hidden": "configuration"})
-    scored = sheet.dropna(subset=RUBRIC_SCORES)
+    scored = sheet.dropna(subset=columns)
 
     rows = []
     for configuration in CONFIGURATIONS:
@@ -745,16 +796,17 @@ def analyse_rubric(path=RUBRIC_FILLED_FILE):
         if part.empty:
             continue
         row = {"configuration": configuration, "answers_scored": len(part)}
-        for column in RUBRIC_SCORES:
+        for column in columns:
             short = column.replace("_0_1_2", "")
             row["mean_" + short] = round(part[column].mean(), 3)
             row["share_full_marks_" + short] = round((part[column] == 2).mean(), 3)
-        row["mean_total_of_6"] = round(part[RUBRIC_SCORES].sum(axis=1).mean(), 3)
+        row["mean_total_of_" + str(2 * len(columns))] = round(
+            part[columns].sum(axis=1).mean(), 3)
         rows.append(row)
     summary = pd.DataFrame(rows)
 
     tests = []
-    for column in RUBRIC_SCORES:
+    for column in columns:
         short = column.replace("_0_1_2", "")
         marked = scored.copy()
         marked[short + "_full"] = marked[column] == 2
