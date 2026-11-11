@@ -1,0 +1,26 @@
+﻿rating_order,question_id,category,correctness_0_1_2,clarity_0_1_2,rater,note,configuration_hidden
+1,Q07,uncertainty,2,2,Aichinger Michael,,C
+2,Q17,regulation,2,2,Aichinger Michael,,B
+3,Q02,maximum,2,2,Aichinger Michael,,A
+4,Q21,creditworthiness,1,1,Aichinger Michael,source eba_guidelines not named,A
+5,Q10,metrics,1,2,Aichinger Michael,"model_card is missing
+",C
+6,Q10,metrics,2,2,Aichinger Michael,,A
+7,Q11,fairness,2,0,Aichinger Michael,only clear for experts,B
+8,Q02,maximum,2,0,Aichinger Michael,only for experts to understand,B
+9,Q24,should_decline,1,2,Aichinger Michael,no human overside,A
+10,Q06,features,2,0,Aichinger Michael,,C
+11,Q02,maximum,2,1,Aichinger Michael,,C
+12,Q11,fairness,0,1,Aichinger Michael,"no human oversite, no standard applicant",A
+13,Q17,regulation,2,2,Aichinger Michael,,A
+14,Q06,features,1,2,Aichinger Michael,,A
+15,Q06,features,2,2,Aichinger Michael,,B
+16,Q24,should_decline,2,0,Aichinger Michael,,B
+17,Q17,regulation,2,2,Aichinger Michael,,C
+18,Q21,creditworthiness,2,2,Aichinger Michael,,C
+19,Q24,should_decline,2,2,Aichinger Michael,,C
+20,Q07,uncertainty,2,2,Aichinger Michael,,B
+21,Q10,metrics,2,2,Aichinger Michael,,B
+22,Q11,fairness,2,0,Aichinger Michael,,C
+23,Q21,creditworthiness,2,2,Aichinger Michael,,B
+24,Q07,uncertainty,2,2,Aichinger Michael,,A

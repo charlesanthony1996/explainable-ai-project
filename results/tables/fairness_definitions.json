@@ -1,0 +1,52 @@
+{
+  "protected_attribute": "age_group",
+  "groups": [
+    "18-30",
+    "31-45",
+    "46-60",
+    "61+"
+  ],
+  "favourable_outcome": "the model predicts approval, that is the calibrated probability of approval at the requested amount reaches the cut-off",
+  "reference_population": "the held-out test split of the dataset in question, 15 percent of the rows, never used for fitting, tuning, calibration or rule selection",
+  "reference_group_rule": "the age group with the highest predicted approval rate",
+  "cut_offs": [
+    0.5,
+    0.8
+  ],
+  "tolerances": {
+    "demographic_parity_ratio": {
+      "limit": 0.8,
+      "direction": "at least",
+      "source": "four-fifths rule, EEOC 29 CFR 1607.4D - a convention from US employment law, used here as a warning line, not as a legal test under EU credit law"
+    },
+    "demographic_parity_difference": {
+      "limit": 0.1,
+      "direction": "at most",
+      "source": "project decision, no external authority"
+    },
+    "equal_opportunity_difference": {
+      "limit": 0.1,
+      "direction": "at most",
+      "source": "project decision, no external authority"
+    },
+    "predictive_parity_difference": {
+      "limit": 0.1,
+      "direction": "at most",
+      "source": "project decision, no external authority"
+    }
+  },
+  "interval_method": {
+    "kind": "non-parametric bootstrap, percentile interval",
+    "replicates": 2000,
+    "confidence": 0.95,
+    "seed": 42,
+    "resampling": "test rows with replacement, not stratified by group, so group sizes vary as they would in a fresh sample",
+    "covers": "sampling variation in the test split only",
+    "does_not_cover": [
+      "the choice of model",
+      "the split seed",
+      "that both datasets are synthetic"
+    ]
+  },
+  "verdict_rule": "a metric is called within tolerance only when the whole interval sits inside it, and a breach only when all of it sits outside; otherwise undecided"
+}

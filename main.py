@@ -189,6 +189,12 @@ def stage_evaluate(reuse_answers=False):
     return run_evaluation(reuse_answers=reuse_answers)
 
 
+def stage_verify_fairness():
+    from explainable_ai_project.fairness_verification import run_fairness_verification
+
+    return run_fairness_verification()
+
+
 def stage_rubric():
     from explainable_ai_project.evaluation import run_rubric_analysis
 
@@ -217,6 +223,7 @@ STAGES = {
     "evaluate": stage_evaluate,
     "counterfactual": stage_counterfactual,
     "rubric": stage_rubric,
+    "verify_fairness": stage_verify_fairness,
 }
 
 
