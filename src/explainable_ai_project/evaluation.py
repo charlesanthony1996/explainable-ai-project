@@ -742,47 +742,158 @@ def rubric_template(answers, question_ids=None, dimensions=None):
 # ------------------------------------------------------------------
 
 RUBRIC_PAGE_FILE = TABLES_FOLDER / "evaluation_rubric_sheet.html"
+RUBRIC_PAGE_FILE_DE = TABLES_FOLDER / "evaluation_rubric_sheet_de.html"
 
-DIMENSION_LABELS = {
-    "correctness_0_1_2": (
-        "Korrektheit",
-        ["0 - falscher Betrag, oder behauptet einen Betrag, obwohl keiner gefunden wurde",
-         "1 - im Kern richtig, laesst aber Wesentliches aus (Obergrenze, menschliche Pruefung)",
-         "2 - vollstaendig richtig"],
-    ),
-    "clarity_0_1_2": (
-        "Verstaendlichkeit",
-        ["0 - Fachjargon ohne Erklaerung, oder unverstaendlich",
-         "1 - verstaendlich, aber umstaendlich oder lueckenhaft",
-         "2 - klar und vollstaendig"],
-    ),
-    "faithfulness_0_1_2": (
-        "Quellentreue",
-        ["0 - widerspricht der Quelle oder erfindet eine Regel",
-         "1 - teilweise gestuetzt",
-         "2 - vollstaendig gestuetzt"],
-    ),
+# English is the primary version: the code, the documents and the report are
+# in English, and Charles rates the second half. The German page exists
+# alongside it and shares the browser store, so switching language keeps the
+# scores already entered.
+
+TEXTS = {
+    "en": {
+        "title": "Rating sheet",
+        "heading": "Rating sheet - explanation quality",
+        "of": "of",
+        "rated": "rated",
+        "applicant": "Applicant",
+        "name": "Name:",
+        "name_hint": "who is rating",
+        "download": "Download CSV",
+        "clear": "Clear entries",
+        "partial": "A partial sheet is fine - unscored rows are reported, not guessed.",
+        "complete": "Complete.",
+        "confirm": "Clear every entry on this page?",
+        "note": "Note (optional)",
+        "other_language": "Auf Deutsch",
+        "other_file": "evaluation_rubric_sheet_de.html",
+        "max": "Estimated maximum",
+        "none_found": "NONE found",
+        "at_limit": " (at the upper limit)",
+        "flagged": "Case flagged",
+        "flagged_yes": "YES - the answer must mention human review",
+        "flagged_no": "no",
+        "source": "Expected source",
+        "passages": "The four passages the markers [1] to [4] refer to",
+        "passages_note": "These belong to the question, not to one particular "
+                         "answer. A marker in an answer that was given no "
+                         "passages is a fabricated citation.",
+        "dimensions": {
+            "correctness_0_1_2": ("Correctness", [
+                "0 - wrong amount, or claims an amount although none was found",
+                "1 - right in substance but omits something essential "
+                "(the upper limit, the human review)",
+                "2 - fully correct"]),
+            "clarity_0_1_2": ("Clarity", [
+                "0 - jargon left unexplained, or simply not understandable",
+                "1 - understandable but laboured or incomplete",
+                "2 - clear and complete"]),
+            "faithfulness_0_1_2": ("Faithfulness", [
+                "0 - contradicts the source, or invents a rule",
+                "1 - partly supported",
+                "2 - fully supported"]),
+        },
+    },
+    "de": {
+        "title": "Bewertungsbogen",
+        "heading": "Bewertungsbogen - Erklaerungsqualitaet",
+        "of": "von",
+        "rated": "bewertet",
+        "applicant": "Antragsteller",
+        "name": "Name:",
+        "name_hint": "wer bewertet",
+        "download": "CSV herunterladen",
+        "clear": "Eingaben loeschen",
+        "partial": "Teilstand reicht - fehlende Zeilen werden gemeldet, nicht geraten.",
+        "complete": "Vollstaendig.",
+        "confirm": "Alle Eingaben auf dieser Seite loeschen?",
+        "note": "Notiz (optional)",
+        "other_language": "In English",
+        "other_file": "evaluation_rubric_sheet.html",
+        "max": "Geschaetztes Maximum",
+        "none_found": "KEINES gefunden",
+        "at_limit": " (an der Obergrenze)",
+        "flagged": "Fall markiert",
+        "flagged_yes": "JA - die Antwort muss menschliche Pruefung nennen",
+        "flagged_no": "nein",
+        "source": "Erwartete Quelle",
+        "passages": "Die vier Textstellen, auf die sich [1] bis [4] beziehen",
+        "passages_note": "Sie gehoeren zur Frage, nicht zu einer bestimmten "
+                         "Antwort. Ein Marker in einer Antwort, die keine "
+                         "Textstellen bekommen hat, ist ein Scheinzitat.",
+        "dimensions": {
+            "correctness_0_1_2": ("Korrektheit", [
+                "0 - falscher Betrag, oder behauptet einen Betrag, obwohl keiner "
+                "gefunden wurde",
+                "1 - im Kern richtig, laesst aber Wesentliches aus "
+                "(Obergrenze, menschliche Pruefung)",
+                "2 - vollstaendig richtig"]),
+            "clarity_0_1_2": ("Verstaendlichkeit", [
+                "0 - Fachjargon ohne Erklaerung, oder unverstaendlich",
+                "1 - verstaendlich, aber umstaendlich oder lueckenhaft",
+                "2 - klar und vollstaendig"]),
+            "faithfulness_0_1_2": ("Quellentreue", [
+                "0 - widerspricht der Quelle oder erfindet eine Regel",
+                "1 - teilweise gestuetzt",
+                "2 - vollstaendig gestuetzt"]),
+        },
+    },
 }
 
 
-def rubric_page(sheet, path=RUBRIC_PAGE_FILE):
-    """Write the scoring sheet as a local page."""
+def passages_for_questions(question_ids):
+    """The four retrieved passages behind each question, labelled [1] to [4].
 
+    Answers carry bracket markers, and a rater who cannot see what [2] points
+    at cannot judge the answer. The passages are a property of the QUESTION,
+    not of the arm: the same question retrieves the same four chunks every
+    time. Showing them on every card therefore gives the rater what they need
+    without revealing which arm wrote the answer - and it makes the markers in
+    the A and B answers legible for what they are, pointers at passages those
+    arms were never given.
+    """
+
+    from explainable_ai_project.retrieve import retrieve
+
+    text_of = {question["id"]: question["text"] for question in QUESTIONS}
+    found = {}
+    for question_id in question_ids:
+        chunks = retrieve(text_of[question_id], top_k=TOP_K)
+        found[question_id] = [
+            {"marker": number,
+             "source": chunk["source"],
+             "score": chunk["score"],
+             "text": chunk["text"]}
+            for number, chunk in enumerate(chunks, start=1)
+        ]
+    return found
+
+
+def rubric_page(sheet, path=RUBRIC_PAGE_FILE, language="en", passages=None):
+    """Write the scoring sheet as a local page in one language."""
+
+    words = TEXTS[language]
     dimensions = scores_present(sheet)
+    if passages is None:
+        passages = passages_for_questions(sorted(set(sheet["question_id"])))
     rows = []
+
     for _, row in sheet.iterrows():
         facts = []
-        maximum = row["estimated_maximum"]
         if bool(row["no_amount_found"]):
-            facts.append(("Geschaetztes Maximum", "KEINES gefunden"))
+            facts.append((words["max"], words["none_found"]))
         else:
-            note = " (an der Obergrenze)" if bool(row["max_is_upper_limit"]) else ""
-            facts.append(("Geschaetztes Maximum", f"{maximum:,.0f}".replace(",", ".") + note))
-        facts.append(("Fall markiert",
-                      "JA - menschliche Pruefung muss genannt werden"
-                      if bool(row["deferral_flagged"]) else "nein"))
+            amount = f"{row['estimated_maximum']:,.0f}"
+            if language == "de":
+                amount = amount.replace(",", ".")
+            at_limit = words["at_limit"] if bool(row["max_is_upper_limit"]) else ""
+            facts.append((words["max"], amount + at_limit))
+
+        facts.append((words["flagged"],
+                      words["flagged_yes"] if bool(row["deferral_flagged"])
+                      else words["flagged_no"]))
+
         if isinstance(row["expected_document"], str) and row["expected_document"]:
-            facts.append(("Erwartete Quelle", row["expected_document"]))
+            facts.append((words["source"], row["expected_document"]))
 
         rows.append({
             "order": int(row["rating_order"]),
@@ -792,25 +903,35 @@ def rubric_page(sheet, path=RUBRIC_PAGE_FILE):
             "category": row["category"],
             "facts": facts,
             "answer": row["answer"],
+            "passages": passages.get(row["question_id"], []),
             "hidden": row["configuration_hidden"],
         })
 
-    data = json.dumps({"rows": rows, "dimensions": [
-        {"key": key, "label": DIMENSION_LABELS[key][0],
-         "options": DIMENSION_LABELS[key][1]} for key in dimensions
-    ]}, ensure_ascii=False)
+    data = json.dumps({
+        "rows": rows,
+        "words": words,
+        "flaggedYes": words["flagged_yes"],
+        "dimensions": [
+            {"key": key,
+             "label": words["dimensions"][key][0],
+             "options": words["dimensions"][key][1]}
+            for key in dimensions
+        ],
+    }, ensure_ascii=False)
 
-    html = RUBRIC_PAGE_TEMPLATE.replace("__DATA__", data)
+    html = (RUBRIC_PAGE_TEMPLATE
+            .replace("__LANG__", language)
+            .replace("__DATA__", data))
     path.write_text(html, encoding="utf-8")
     return path
 
 
 RUBRIC_PAGE_TEMPLATE = """<!doctype html>
-<html lang="de">
+<html lang="__LANG__">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bewertungsbogen</title>
+<title>Rating sheet</title>
 <style>
   :root {
     --bg: #f6f6f4; --card: #ffffff; --ink: #1b1b1a; --muted: #6a6a66;
@@ -841,6 +962,14 @@ RUBRIC_PAGE_TEMPLATE = """<!doctype html>
   .answer { white-space: pre-wrap; background: #fbfbf9; border: 1px solid var(--line);
             border-left: 3px solid var(--accent); border-radius: 6px;
             padding: 14px 16px; margin-bottom: 16px; }
+  details { border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px;
+            margin-bottom: 16px; background: #fafaf8; }
+  summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+  .passage { border-top: 1px solid var(--line); padding: 10px 0; font-size: 14px; }
+  .passage .mk { font-weight: 700; color: var(--accent); }
+  .passage .src { color: var(--muted); }
+  .passage p { margin: 6px 0 0; white-space: pre-wrap; }
+  .pnote { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
   .dim { margin-bottom: 12px; }
   .dim > b { display: block; margin-bottom: 6px; font-size: 15px; }
   label { display: block; cursor: pointer; padding: 5px 10px; border-radius: 6px;
@@ -864,25 +993,41 @@ RUBRIC_PAGE_TEMPLATE = """<!doctype html>
 </head>
 <body>
 <header><div class="wrap">
-  <h1>Bewertungsbogen - Erklaerungsqualitaet</h1>
-  <div class="sub" id="status">0 von 0 bewertet</div>
+  <h1 id="heading"></h1>
+  <div class="sub" id="status"></div>
   <div class="bar"><div id="bar"></div></div>
+  <div class="sub" style="margin-top:6px"><a id="switch" href="#"></a></div>
 </div></header>
 
 <div class="wrap" id="cards"></div>
 
 <footer><div class="frow">
-  <label style="padding:0">Name: <input type="text" id="rater" placeholder="Michael oder Charles"></label>
-  <button id="save" disabled>CSV herunterladen</button>
-  <button class="ghost" id="clear">Eingaben loeschen</button>
+  <label style="padding:0"><span id="nameLabel"></span>
+    <input type="text" id="rater"></label>
+  <button id="save" disabled></button>
+  <button class="ghost" id="clear"></button>
   <span class="sub" id="hint"></span>
 </div></footer>
 
 <script>
 const DATA = __DATA__;
+const W = DATA.words;
+// One store for both languages, so switching keeps what is already entered.
 const KEY = "rubrik-v1";
 let state = {};
 try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+
+document.getElementById("heading").textContent = W.heading;
+document.getElementById("nameLabel").textContent = W.name;
+document.getElementById("rater").placeholder = W.name_hint;
+document.getElementById("save").textContent = W.download;
+document.getElementById("clear").textContent = W.clear;
+const switcher = document.getElementById("switch");
+switcher.textContent = W.other_language;
+switcher.href = W.other_file;
+
+const esc = s => String(s).replace(/[&<>]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
 const cards = document.getElementById("cards");
 DATA.rows.forEach(row => {
@@ -891,7 +1036,7 @@ DATA.rows.forEach(row => {
   card.id = "card-" + row.order;
 
   let facts = row.facts.map(([k, v]) => {
-    const warn = String(v).startsWith("JA") ? ' class="flag"' : "";
+    const warn = v === DATA.flaggedYes ? ' class="flag"' : "";
     return `<div><b>${k}</b><span${warn}>${v}</span></div>`;
   }).join("");
 
@@ -903,14 +1048,21 @@ DATA.rows.forEach(row => {
   }).join("");
 
   card.innerHTML = `
-    <div><span class="num">${row.order} von ${DATA.rows.length}</span>
+    <div><span class="num">${row.order} ${W.of} ${DATA.rows.length}</span>
          <span class="sub"> &middot; ${row.question_id} &middot; ${row.category}
-         &middot; Antragsteller ${row.applicant}</span></div>
+         &middot; ${W.applicant} ${row.applicant}</span></div>
     <div class="q">${row.question}</div>
     <div class="facts">${facts}</div>
-    <div class="answer">${row.answer.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</div>
+    <div class="answer">${esc(row.answer)}</div>
+    <details><summary>${W.passages}</summary>
+      <div class="pnote">${W.passages_note}</div>
+      ${row.passages.map(p => `<div class="passage">
+         <span class="mk">[${p.marker}]</span>
+         <span class="src">${esc(p.source)} &middot; ${p.score}</span>
+         <p>${esc(p.text)}</p></div>`).join("")}
+    </details>
     ${dims}
-    <div class="dim"><b>Notiz (optional)</b>
+    <div class="dim"><b>${W.note}</b>
       <textarea rows="2" id="note-${row.order}"></textarea></div>`;
   cards.appendChild(card);
 });
@@ -955,19 +1107,19 @@ function refresh() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
 
   const total = DATA.rows.length;
-  document.getElementById("status").textContent = complete + " von " + total + " bewertet";
+  document.getElementById("status").textContent =
+    complete + " " + W.of + " " + total + " " + W.rated;
   document.getElementById("bar").style.width = (100 * complete / total) + "%";
   document.getElementById("save").disabled = complete === 0;
-  document.getElementById("hint").textContent = complete < total
-    ? "Teilstand reicht - fehlende Zeilen werden beim Auswerten gemeldet."
-    : "Vollstaendig.";
+  document.getElementById("hint").textContent =
+    complete < total ? W.partial : W.complete;
 }
 
 document.addEventListener("input", refresh);
 document.addEventListener("change", refresh);
 
 document.getElementById("clear").onclick = () => {
-  if (!confirm("Alle Eingaben auf dieser Seite loeschen?")) return;
+  if (!confirm(W.confirm)) return;
   localStorage.removeItem(KEY);
   location.reload();
 };
@@ -1180,7 +1332,8 @@ def analyse(answers):
 
     sheet = rubric_template(answers)
     sheet.to_csv(RUBRIC_FILE, index=False)
-    rubric_page(sheet)
+    rubric_page(sheet, RUBRIC_PAGE_FILE, language="en")
+    rubric_page(sheet, RUBRIC_PAGE_FILE_DE, language="de")
 
     print()
     print("-" * 70)
