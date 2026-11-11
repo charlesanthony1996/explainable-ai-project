@@ -7,10 +7,10 @@ Do I have a right to an explanation of a decision made about me by an AI system?
 How should a lender assess whether a borrower can repay a loan?,eba_guidelines,"eba_guidelines, eba_guidelines, eba_guidelines, eba_guidelines",0.6474,1,True
 What do the guidelines say about using automated models in lending decisions?,eba_guidelines,"eba_guidelines, eba_guidelines, eba_guidelines, eba_guidelines",0.6616,1,True
 What should be checked about a borrower's income and financial situation?,eba_guidelines,"eba_guidelines, eba_guidelines, eba_guidelines, eba_guidelines",0.5922,1,True
-How often does the model approve applicants aged 61 and over?,fairness_report,"fairness_report, fairness_report, fairness_report, fairness_report",0.5606,1,True
+How often does the model approve applicants aged 61 and over?,fairness_report,"fairness_report, model_card, fairness_report, fairness_report",0.5606,1,True
 Is the model equally well calibrated for every age group?,fairness_report,"fairness_report, fairness_report, fairness_report, fairness_report",0.6197,1,True
-Did removing age from the model reduce the differences between age groups?,fairness_report,"fairness_report, fairness_report, fairness_report, fairness_report",0.6881,1,True
-"Which settings were chosen for the random forest, and how was it calibrated?",model_card,"model_card, model_card, model_card, feature_glossary",0.4622,1,True
+Did removing age from the model reduce the differences between age groups?,fairness_report,"fairness_report, fairness_report, model_card, fairness_report",0.6881,1,True
+"Which settings were chosen for the random forest, and how was it calibrated?",model_card,"model_card, model_card, feature_glossary, model_card",0.4554,1,True
 "What does loan-to-income mean, and what counts as a high value?",feature_glossary,"feature_glossary, feature_glossary, eba_guidelines, eba_guidelines",0.5138,1,True
-Was there any leakage found in the datasets?,data_quality,"datasheet, datasheet, data_quality, data_quality",0.4641,3,True
-Where do the two loan datasets come from and how large are they?,"datasheet, data_quality","feature_glossary, fairness_report, datasheet, fairness_report",0.5928,3,True
+Was there any leakage found in the datasets?,data_quality,"datasheet, data_quality, datasheet, datasheet",0.5344,2,True
+Where do the two loan datasets come from and how large are they?,"datasheet, data_quality","datasheet, feature_glossary, fairness_report, datasheet",0.5986,1,True

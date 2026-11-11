@@ -1,2 +1,2 @@
 questions,top_k,hits,hit_rate,average_place_of_first_hit,embedding_model
-15,4,15,1.0,1.27,sentence-transformers/all-MiniLM-L6-v2
+15,4,15,1.0,1.07,sentence-transformers/all-MiniLM-L6-v2

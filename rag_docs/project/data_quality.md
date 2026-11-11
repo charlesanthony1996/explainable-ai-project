@@ -1,6 +1,6 @@
 # Data quality report
 
-Written by `reports_governance.py` on 2026-11-09 11:01. Do not edit by hand; rerun instead.
+Written by `reports_governance.py` on 2026-11-11 13:27. Do not edit by hand; rerun instead.
 
 ## 1–2. Raw datasets, missing values and duplicates (steps 1 and 2)
 

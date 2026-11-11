@@ -1,8 +1,8 @@
 doc_id,chunks,sections,mean_words,largest_chunk_words,smallest_chunk_words
 data_quality,24,21,69.1,152,7
-datasheet,12,12,42.2,178,7
+datasheet,12,12,65.7,178,7
 eba_guidelines,282,55,142.3,180,9
 eu_ai_act,540,140,142.3,180,5
 fairness_report,25,8,136.2,180,26
 feature_glossary,5,5,78.0,134,23
-model_card,15,14,64.5,161,14
+model_card,15,14,84.3,170,18

@@ -31,3 +31,7 @@ date,step,file,md5,size_kb,note
 2026-11-09 11:03,30 collect documents,rag_docs\project\model_card.md,ed17dd79049c85a2afd387e1b09ce9c5,5.2,RAG document
 2026-11-09 11:03,30 collect documents,rag_docs\project\fairness_report.md,8e20920e38ec716b2f8b01eb152c1fc8,13.1,RAG document
 2026-11-09 11:03,30 collect documents,rag_docs\project\feature_glossary.md,923b21da21d0a0b4ac0d3e3dd3ab35e8,2.4,RAG document
+2026-11-11 13:28,23 revocation,models\rf_monotonic_dataset_1_revocation_demo.joblib,7885f01529cfe6acd34a5b9edc5f247a,32442.9,applicant D1-26978 removed; model retrained; old md5 22947c186386b08e0f64a33d4c8c125d
+2026-11-11 13:28,30 collect documents,rag_docs\project\datasheet.md,2dda0a2709fd11b51257e795184f7579,4.7,RAG document
+2026-11-11 13:28,30 collect documents,rag_docs\project\data_quality.md,96255960044f9d58aaeb97f2d8939153,8.3,RAG document
+2026-11-11 13:28,30 collect documents,rag_docs\project\model_card.md,e96ff8cc5ccd6a9202815650572e5cf6,7.0,RAG document
