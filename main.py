@@ -146,6 +146,48 @@ def main():
 
 
 
+# ------------------------------------------------------------------
+# Governance and verification (added on the team branch)
+#
+# These four read what the training pathway already wrote and add nothing
+# to it, so they run in seconds and can be repeated at any time. They are
+# separate commands rather than part of main() because none of them needs
+# a retrain, and waiting an hour to redraw a diagram helps nobody.
+# ------------------------------------------------------------------
+
+def verify_fairness():
+    from explainable_ai_project.fairness_verification import run_fairness_verification
+    return run_fairness_verification()
+
+
+def zones():
+    from explainable_ai_project.human_control import run_zones
+    return run_zones()
+
+
+def provenance():
+    from explainable_ai_project.provenance import run_provenance
+    return run_provenance()
+
+
+def overview():
+    from explainable_ai_project.overview_figure import make_overview_figures
+    return make_overview_figures()
+
+
+def team_rubric(arguments):
+    from explainable_ai_project.team_rubric import run_team_rubric
+    return run_team_rubric(read_back="--read" in arguments)
+
+
+EXTRA_COMMANDS = {
+    "verify_fairness": verify_fairness,   # parity with bootstrap intervals
+    "zones": zones,                       # the four human-control zones
+    "provenance": provenance,             # provenance record + governance decision
+    "overview": overview,                 # the three overview diagrams
+}
+
+
 if __name__ == "__main__":
     import sys
 
@@ -158,5 +200,9 @@ if __name__ == "__main__":
         # uv run main.py evaluate ...   -> the evaluation pathway
         from explainable_ai_project.evaluation import run_from_command_line as run_evaluation
         run_evaluation(sys.argv[2:])
+    elif len(sys.argv) > 1 and sys.argv[1] == "team_rubric":
+        team_rubric(sys.argv[2:])
+    elif len(sys.argv) > 1 and sys.argv[1] in EXTRA_COMMANDS:
+        EXTRA_COMMANDS[sys.argv[1]]()
     else:
         main()
