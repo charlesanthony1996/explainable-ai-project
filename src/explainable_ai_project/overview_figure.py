@@ -28,6 +28,7 @@ FIGURES_FOLDER = PROJECT_ROOT / "results" / "figures"
 
 OVERVIEW_FILE = FIGURES_FOLDER / "uebersicht_gesamt.png"
 EVALUATION_FILE = FIGURES_FOLDER / "uebersicht_evaluation.png"
+GOVERNANCE_FILE = FIGURES_FOLDER / "uebersicht_governance.png"
 
 # A second home for the figures, so they can be embedded in the notes. Skipped
 # without complaint if the vault is not on this machine.
@@ -483,11 +484,124 @@ def draw_evaluation():
 
 # ------------------------------------------------------------------
 
+# ------------------------------------------------------------------
+# Diagram 3: governance
+#
+# Not the architecture again. This one answers the questions a reviewer
+# asks: at each step of a decision, what stops it going wrong, and what
+# file proves the step happened. The flow runs down the middle, the
+# controls sit on its left and the evidence on its right, so any step can
+# be read across in one line.
+# ------------------------------------------------------------------
+
+def draw_governance():
+    figure, axes = new_canvas(
+        16, 13,
+        "Governance - wer entscheidet was, und womit belegt",
+        "Verantwortlich: Michael Aichinger und Charles Anthony gemeinsam  |  "
+        "Kein Review geplant: das Projekt endet mit der Abgabe",
+    )
+
+    # --- declared tolerances -------------------------------------
+    axes.add_patch(FancyBboxPatch(
+        (2.5, 83.0), 95, 9.0,
+        boxstyle="round,pad=0.4,rounding_size=0.8",
+        linewidth=1.5, edgecolor=GREY, facecolor="#f7f7f5", zorder=1))
+    axes.text(50, 91.2, "ERKLAERTE TOLERANZ  -  eine Metrik gilt erst als "
+                        "verletzt, wenn das ganze Konfidenzintervall ausserhalb liegt",
+              ha="center", va="top", fontsize=10, fontweight="bold",
+              color="#333333")
+    tolerances = [
+        ("Demographic parity ratio", "mind. 0,80", "Four-Fifths-Rule (EEOC)"),
+        ("Demographic parity difference", "max. 0,10", "vom Projekt gesetzt"),
+        ("Equal opportunity difference", "max. 0,10", "vom Projekt gesetzt"),
+        ("Predictive parity difference", "max. 0,10", "vom Projekt gesetzt"),
+    ]
+    for number, (name, limit, origin) in enumerate(tolerances):
+        x = 4.5 + number * 23.4
+        axes.text(x, 88.0, name, ha="left", va="top", fontsize=8.4,
+                  color="#222222", fontweight="bold")
+        axes.text(x, 86.2, limit + "   " + origin, ha="left", va="top",
+                  fontsize=8.0, color="#666666")
+
+    # --- the three lanes -----------------------------------------
+    axes.text(16.0, 80.0, "KONTROLLE", ha="center", va="top", fontsize=10.5,
+              fontweight="bold", color=RED)
+    axes.text(50.0, 80.0, "ENTSCHEIDUNGSWEG", ha="center", va="top",
+              fontsize=10.5, fontweight="bold", color="#333333")
+    axes.text(84.0, 80.0, "NACHWEIS", ha="center", va="top", fontsize=10.5,
+              fontweight="bold", color=TEAL)
+
+    steps = [
+        ("1  Daten", ["52.000 + 20.000 Zeilen", "synthetisch, keine Personen"],
+         ["Leakage-Scan: RiskScore raus", "Preprocessor nur auf Train"],
+         ["governance_log.csv", "datasheet.md", "provenance.json"]),
+        ("2  Modelle A + B", ["monotoner Random Forest", "isoton kalibriert"],
+         ["Betrag darf P nur senken", "Test genau einmal benutzt"],
+         ["model_card.md", "model_results.csv"]),
+        ("3  Fairness geprueft", ["je Altersgruppe", "mit Konfidenzintervall"],
+         ["Toleranz vorher erklaert", "Intervall entscheidet, nicht der Punkt"],
+         ["parity_table_with_intervals.csv", "fairness_definitions.json"]),
+        ("4  Konflikt entschieden", ["Predictive parity haelt,", "demographic parity nicht"],
+         ["Equal opportunity gewaehlt", "Verzicht begruendet, nicht kaschiert"],
+         ["governance_decision.md"]),
+        ("5  Regeln gewaehlt", ["3 Sicherheits- + 2 Evidenzregeln", "-> 4 aktiv"],
+         ["Evidenzregel nur bei", "Genauigkeitsabfall >= 0,03"],
+         ["deferral_rule_choice.csv"]),
+        ("6  Vier Zonen", ["auto-accept / sample audit /", "human review / safe-stop"],
+         ["10 % der Ablehnungen geprueft", "safe-stop: System antwortet nicht"],
+         ["control_zones.csv"]),
+        ("7  Antwort geprueft", ["jede Zahl gegen das Contract", "jedes Zitat gegen die Quelle"],
+         ["LLM rechnet nie selbst", "Pruefung laeuft automatisch"],
+         ["interaction_log.csv", "evaluation_*.csv"]),
+    ]
+
+    top = 76.0
+    height = 7.4
+    gap = 1.7
+
+    for number, (title, lines, controls, evidence) in enumerate(steps):
+        y = top - number * (height + gap) - height
+        box(axes, 33.0, y, 34.0, height, title, lines,
+            colour=BLUE, title_size=10.2, line_size=8.2, fill="white")
+
+        for place, text in enumerate(controls):
+            axes.text(31.0, y + height - 2.0 - place * 1.8, text,
+                      ha="right", va="top", fontsize=8.2, color=RED)
+        for place, text in enumerate(evidence):
+            axes.text(69.0, y + height - 2.0 - place * 1.8, text,
+                      ha="left", va="top", fontsize=8.2, color=TEAL,
+                      family="monospace")
+
+        if number > 0:
+            arrow(axes, (50.0, y + height + gap), (50.0, y + height + 0.3),
+                  colour="#999999")
+
+    # --- what is not covered -------------------------------------
+    axes.add_patch(FancyBboxPatch(
+        (2.5, 1.5), 95, 7.4,
+        boxstyle="round,pad=0.4,rounding_size=0.8",
+        linewidth=1.8, edgecolor=RED, facecolor="#fdf5f5", zorder=1))
+    axes.text(50, 7.9, "NICHT ABGEDECKT  -  ausdruecklich, statt stillschweigend",
+              ha="center", va="top", fontsize=10, fontweight="bold", color=RED)
+    axes.text(50, 5.6,
+              "Kein operativer Verantwortlicher nach der Abgabe  ·  "
+              "kein Review geplant  ·  Delay und Override-Qualitaet nicht "
+              "messbar, da kein Mensch im Loop  ·\n"
+              "Learning-to-defer nicht umgesetzt  ·  beide Datensaetze "
+              "synthetisch, der gesamte Record faellt bei echten Antragsteller"
+              "daten  ·  Toleranz 0,10 gesetzt, nicht abgeleitet",
+              ha="center", va="top", fontsize=8.4, color="#333333")
+
+    return figure
+
+
 def make_overview_figures():
     FIGURES_FOLDER.mkdir(parents=True, exist_ok=True)
 
     for drawer, path in [(draw_overview, OVERVIEW_FILE),
-                         (draw_evaluation, EVALUATION_FILE)]:
+                         (draw_evaluation, EVALUATION_FILE),
+                         (draw_governance, GOVERNANCE_FILE)]:
         figure = drawer()
         figure.savefig(path, dpi=150, bbox_inches="tight", facecolor="white")
         plt.close(figure)
