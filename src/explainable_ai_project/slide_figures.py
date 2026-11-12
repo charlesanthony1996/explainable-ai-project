@@ -269,27 +269,28 @@ def three_steps():
              "that still reaches an 80% chance"),
             ("The reasons behind it",
              "SHAP: which detail helped, which hurt"),
-            ("Machine or human?",
+            ("● Machine or human?",
              "four rules decide, before any answer"),
             ("Qwen puts it in words",
              "it may quote our figures,\nnever compute its own"),
         ], None),
         (GREEN, "3 \u00b7 CHECK & GOVERN", "Is it fair? Is it honest?", [
-            ("Fairness, with error bars",
+            ("\u25cf Fairness, with error bars",
              "is the gap real or just a small sample?"),
-            ("Who may decide what",
+            ("\u25cf Who may decide what",
              "four zones, from automatic to stop"),
-            ("Every number re-checked",
+            ("\u25cf Every number re-checked",
              "against the figures we computed"),
-            ("The decision, written down",
+            ("\u25cf The decision, written down",
              "what we chose, who is accountable"),
         ], "#F3F8F5"),
     ])
 
     footline(axes, bottom,
-             "Step 3 is what makes steps 1 and 2 defensible.",
-             "Without it the system is only plausible. With it, every claim "
-             "can be checked.")
+             "\u25cf = my part. Steps 1 and 2 are the team's model work; "
+             "mine is who may decide, and all of step 3.",
+             "Step 3 is what makes steps 1 and 2 defensible: without it the "
+             "system is only plausible, with it every claim can be checked.")
     return figure
 
 
@@ -409,8 +410,8 @@ PLAN_STEPS = [
       "accuracy drop of at least 0.03"],
      "5 · Rules chosen", "3 safety + 2 evidence rules → 4 active",
      "deferral_rule_choice.csv", "18"),
-    (["10% of the rejections are audited",
-      "safe-stop: the system answers nothing"],
+    (["10% of all automatic refusals are read",
+      "safe-stop: no answer is given at all"],
      "6 · Four zones", "auto-accept / audit / review / safe-stop",
      "control_zones.csv", "18"),
     (["The model never computes a figure",
@@ -429,36 +430,32 @@ TOLERANCES = [
 
 def plan():
     figure, axes = canvas()
-    write(axes, 50, 98.0, "The plan: seven steps, each one controlled "
-                          "and each one evidenced",
+    write(axes, 50, 98.0, "Check and governance: seven steps, each one "
+                          "controlled and each one evidenced",
           14.5, INK, "bold", "center")
-    write(axes, 50, 93.0,
-          "Accountable: Michael Aichinger and Charles Anthony jointly  |  "
-          "No review planned: the project ends at submission",
-          10.0, MUTED, "normal", "center")
 
     # The tolerance strip. It belongs at the top because it is what makes
     # the next three slides judgeable: the limits were written down before
     # the numbers were computed.
     axes.add_patch(FancyBboxPatch(
-        (2.0, 77.0), 96.0, 10.0,
+        (2.0, 80.0), 96.0, 10.0,
         boxstyle="round,pad=0.4,rounding_size=1.2",
         linewidth=1.8, edgecolor=MUTED, facecolor="#EFEDE7", zorder=1))
-    write(axes, 50, 86.0,
+    write(axes, 50, 89.0,
           "DECLARED IN ADVANCE  —  a measure counts as breached only "
           "when the WHOLE interval lies outside the tolerance",
           10.3, INK, "bold", "center")
     for place, (name, limit, source) in enumerate(TOLERANCES):
         x = 5.0 + place * 23.5
-        write(axes, x, 82.3, name, 9.6, INK, "bold")
-        write(axes, x, 79.3, limit + "   " + source, 9.0, MUTED)
+        write(axes, x, 85.3, name, 9.6, INK, "bold")
+        write(axes, x, 82.3, limit + "   " + source, 9.0, MUTED)
 
-    write(axes, 20.0, 73.0, "CONTROL", 10.5, RUST, "bold", "right")
-    write(axes, 50.0, 73.0, "THE PATH", 10.5, INK, "bold", "center")
-    write(axes, 69.0, 73.0, "EVIDENCE", 10.5, GREEN, "bold")
+    write(axes, 20.0, 76.0, "CONTROL", 10.5, RUST, "bold", "right")
+    write(axes, 50.0, 76.0, "THE PATH", 10.5, INK, "bold", "center")
+    write(axes, 69.0, 76.0, "EVIDENCE", 10.5, GREEN, "bold")
 
-    row = 9.3
-    first = 68.0
+    row = 9.8
+    first = 71.0
     for place, step in enumerate(PLAN_STEPS):
         controls, name, detail, evidence, slide = step
         top = first - place * row
@@ -538,14 +535,16 @@ def fairness_metrics():
           r"where $\hat{p}_g$ is the share of group $g$ the model approves",
           10.0, INK)
 
-    note_box(axes, 2.0, 97.0, bottom - 11.0, 13.5, GREEN, "#F3F8F5",
+    note_box(axes, 2.0, 97.0, bottom - 11.0, 17.5, GREEN, "#F3F8F5",
              "One measure holds and three fail — so a choice is "
              "unavoidable, and it has to be written down.",
-             "2,000 bootstrap resamples, seed 42. On dataset 2 the groups "
-             "are smaller and 4 of the 8 measures stay undecided: their "
-             "interval\nstraddles the tolerance, so the honest answer is "
-             "\"not enough data\", not \"fair\".")
-    axes.set_ylim(bottom - 26.5, 100)
+             "2,000 resamples, seed 42. The 8 are 4 measures × 2 "
+             "cut-offs (0.5 and 0.8); here all 8 are decided.\n"
+             "On dataset 2 the groups are far smaller — 120 over-61 "
+             "— and 5 of the 8 stay UNDECIDED:\n"
+             "the interval straddles the tolerance, so the honest answer "
+             "is \"not enough data\", not \"fair\".")
+    axes.set_ylim(bottom - 31.0, 100)
     return figure
 
 
@@ -573,13 +572,15 @@ def rules_and_zones():
     rows = [
         ["missing data", "safety", "a required field is empty",
          "0.0%", "—", "—", "ON"],
-        ["unusual input", "safety", "a value outside the training range",
+        ["unusual input", "safety", "value outside the 1st-99th percentile",
          "7.9%", "—", "—", "ON"],
-        ["weak group", "safety", "a group the model is poor on",
+        ["weak group", "safety", "within-group AUC below 0.60",
          "5.0%", "—", "—", "ON"],
-        ["borderline", "evidence", "probability sits near the cut-off",
+        ["borderline", "evidence", "| P − 0.80 |  ≤  0.05, "
+                                   "so P from 0.75 to 0.85",
          "1.1%", "77.7%", "85.0%", "ON"],
-        ["disagreement", "evidence", "models A and B do not agree",
+        ["disagreement", "evidence",
+         "| P(model A) − P(model B) |  >  0.50",
          "29.2%", "85.5%", "85.0%", "OFF"],
     ]
     bottom = table(axes, 2.0, 97.0, 86.0, columns, rows,
@@ -610,13 +611,13 @@ def rules_and_zones():
         ("Really approved", 1.00, "right"),
     ]
     zone_rows = [
-        ["auto-accept", "answered without anyone looking",
+        ["auto-accept", "P ≥ 0.80 — answered, nobody looks",
          "5,156", "66.1%", "0", "84.7%"],
-        ["sample audit", "a 10% sample is read afterwards",
+        ["sample audit", "P < 0.80 — a 10% sample is read later",
          "1,648", "21.1%", "165", "14.1%"],
         ["human review", "a person decides together with the model",
          "68", "0.9%", "68", "79.4%"],
-        ["safe-stop", "no basis at all — the system gives no answer",
+        ["safe-stop", "no basis at all — no answer is given",
          "928", "11.9%", "928", "37.9%"],
     ]
     lowest = table(axes, 2.0, 97.0, bottom - 19.0, zone_columns, zone_rows,
@@ -627,7 +628,13 @@ def rules_and_zones():
           "1,161 of 7,800 cases reach a person — 14.9%. "
           "Of the over-61: 100% safe-stop, not one automatic answer.",
           10.6, INK, "bold")
-    axes.set_ylim(lowest - 6.5, 100)
+    write(axes, 2.0, lowest - 4.4,
+          "\"Really approved\" = the share in that zone who did get a loan "
+          "in the data — the true label, not the model's output.\n"
+          "Both models run on every applicant; disagreement compares their "
+          "two probabilities.",
+          9.8, MUTED)
+    axes.set_ylim(lowest - 13.5, 100)
     return figure
 
 
@@ -656,10 +663,12 @@ def contract_figure():
              "against the list, 1% relative or\n0.005 absolute tolerance"),
             ("Every citation matched",
              "against the passages that were\nactually retrieved"),
-            ("Two tries, then a safe answer",
-             "the fallback answer was never\nneeded in 72 runs"),
+            ("If the check fails: one retry",
+             "then a fixed safe answer replaces\nthe model's. Never needed "
+             "in 72 runs"),
         ], None),
-        (GREEN, "WHAT IT PROVED", "24 questions, 4 applicants", [
+        (GREEN, "WHAT IT PROVED", "24 questions × 4 applicants × "
+                                  "3 runs", [
             ("Citations: 15 of 15",
              "run C only. A and B: 0 of 15.\nExact McNemar p = 0.000061"),
             ("Invented markers: 24 of 24",
@@ -670,9 +679,11 @@ def contract_figure():
     ])
 
     footline(axes, bottom,
-             "The contract is what makes the measurement possible at all.",
-             "A number is then right or wrong against a file, not against "
-             "an opinion — so no human judgement is needed to mark it.")
+             "A = applicant data only  ·  B = plus the contract  "
+             "·  C = plus four retrieved passages",
+             "Only the support changes, so the comparison is fair.\n"
+             "p = how likely a split this lopsided would be if the two "
+             "set-ups were really equal; below 0.05 we call it real.")
     return figure
 
 
@@ -719,8 +730,10 @@ def language_model():
     footline(axes, bottom,
              "Grounding buys correctness and costs readability. "
              "That is a design problem, not a bug.",
-             "Cohen's κ = −0.04: one reader simply stricter. 75% "
-             "agreed within one point, and both ranked the runs alike.")
+             "p = how likely a gap this large is by chance alone. "
+             "0.219 = about once in five, too often to call it real.\n"
+             "Cohen's κ = −0.04: one reader was simply stricter. "
+             "75% agreed within one point, and both ranked the runs alike.")
     return figure
 
 
@@ -862,13 +875,22 @@ def equal_opportunity():
           "Difference 0.966, where we allow 0.100.",
           12.0, INK, "bold")
     write(axes, left + 2.0, bar - 5.6,
-          "Not a small-sample accident: resampling the test rows 2,000 times "
-          "puts the gap between 0.959 and 0.973.\n"
-          "Same model, same cut-off — the over-61 are simply never "
-          "approved, although 15.4% of them were in the data.",
-          10.8, MUTED)
+          "The other three groups differ by only 0.079 — inside the "
+          "tolerance. The breach is the over-61 alone.\n"
+          "2,000 resamples put the gap at 0.959 to 0.973 — real, "
+          "although 15.4% of them were approved in the data.",
+          10.6, MUTED)
 
-    axes.set_ylim(bar - 14.0, 100)
+    write(axes, left, bar - 18.0,
+          "What sends them to a person is not the fairness choice but a "
+          "separate rule:\n"
+          "61+ has a within-group AUC of 0.52, below the 0.60 limit, so the "
+          "weak-group rule puts all of them in safe-stop.\n"
+          "Equal opportunity is what we report against; the AUC is what "
+          "pulls the trigger.",
+          10.3, INK)
+
+    axes.set_ylim(bar - 30.0, 100)
     return figure
 
 

@@ -663,7 +663,7 @@ def draw_measurement():
          "Behandelt das Modell Altersgruppen unterschiedlich -\n"
          "und ist der Unterschied groesser als der Zufall?",
          "Luecke real: 0,966 (Spanne 0,959-0,973).\n"
-         "Bei Datensatz 2: 4 von 8 Massen unentscheidbar.",
+         "Bei Datensatz 2: 5 von 8 Massen unentscheidbar.",
          RED)
 
     step(51.5, 66.0, 45.0, 17.0, "2", "Vier Kontrollzonen",

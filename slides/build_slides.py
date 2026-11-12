@@ -71,22 +71,24 @@ WIDE = "fit:1.22,11.90,5.35"
 
 CONTENT = {
     "story": {
-        "eyebrow": "MY PART \u00b7 WHAT I BUILT AND HOW I CHECKED IT",
+        "eyebrow": "THE SYSTEM AS A WHOLE \u00b7 MY PART IS MARKED",
         "source": "Source: slide_figures.py, run_all.sh \u00b7 14",
         "figure": ("folie_drei_schritte.png", WIDE),
         "notes":
-            "My half of the project in one picture. Steps 1 and 2 are the "
-            "system: train two forests on 72,000 past applications, then "
-            "for one applicant compute the largest amount that still "
-            "reaches an 80% chance, the SHAP reasons, and whether a human "
-            "has to decide. Step 3 is where most of the time went: "
-            "checking that the result is fair, that the explanation is "
-            "honest, and writing the decisions down. Without step 3 the "
-            "system is only plausible. With it, every claim in the next "
-            "seven slides can be checked against a file.",
+            "The whole system in one picture, so you can see where my part "
+            "sits. Steps 1 and 2 are the team's model work: two forests on "
+            "72,000 past applications, and for one applicant the largest "
+            "amount that still reaches an 80% chance, with the SHAP "
+            "reasons. The marked items are mine - inside step 2, the rules "
+            "that decide whether a machine may answer at all, and then the "
+            "whole of step 3. That is where most of my time went: checking "
+            "that the result is fair, that the explanation is honest, and "
+            "writing the decisions down. Without step 3 the system is only "
+            "plausible. With it, every claim in the next seven slides can "
+            "be checked against a file.",
     },
     "theplan": {
-        "eyebrow": "THE PLAN \u00b7 EVERY STEP HAS A CONTROL AND A PROOF",
+        "eyebrow": "CHECK AND GOVERNANCE \u00b7 EVERY STEP HAS A CONTROL AND A PROOF",
         "source": "Source: governance_decision.md, provenance.json \u00b7 15",
         "figure": ("folie_plan.png", WIDE),
         "notes":
@@ -100,7 +102,10 @@ CONTENT = {
             "whole confidence interval lies outside - that is what stops "
             "us from moving the goalposts afterwards. Second, steps 1 and "
             "2 are the team's slides 3 and 5, so I will not repeat them. "
-            "I start at step 3.",
+            "I start at step 3. If anyone asks who is accountable: Charles "
+            "and I jointly, there is no review planned, and the project "
+            "ends at submission - that is on the last slide rather than "
+            "this one.",
     },
     "fairness": {
         "eyebrow": "STEP 3 \u00b7 FAIRNESS MEASURED, WITH CONFIDENCE INTERVALS",
@@ -116,9 +121,13 @@ CONTENT = {
             "breached, one holds. The intervals matter: with 2,000 "
             "resamples the equal-opportunity gap sits between 0.959 and "
             "0.973, so it is a property of the model, not of which rows "
-            "landed in the test split. On dataset 2 the groups are much "
-            "smaller, and 4 of 8 measures stay undecided - we report that "
-            "as undecided rather than calling it fair.",
+            "landed in the test split. The eight measures are these four "
+            "at two cut-offs, 0.5 and 0.8. On dataset 1 all eight are "
+            "decided: six breached, two held, both of them predictive "
+            "parity. On dataset 2 the groups are far smaller - 120 over-61 "
+            "instead of 390 - and five of the eight stay undecided, "
+            "because the interval straddles the tolerance. Undecided is "
+            "not the same as fair, and we report it as undecided.",
     },
     "conflict": {
         "eyebrow": "STEP 4 \u00b7 THE CONFLICT, GROUP BY GROUP",
@@ -138,7 +147,16 @@ CONTENT = {
             "someone who would have repaid. And we did not patch it: "
             "removing the age field changes the gap by nothing, 0.966 "
             "before and after, because the credit score carries the same "
-            "signal.",
+            "signal. Two likely questions. Is 88.7 percent good enough for "
+            "the 46-60 group? By our declared tolerance, yes: the three "
+            "younger groups differ by only 0.079, inside the 0.10 limit. "
+            "The whole breach is the over-61. And does choosing equal "
+            "opportunity mean the over-61 always go to a human? Not "
+            "directly - those are two separate things. The fairness choice "
+            "is what we report against; what actually routes them is the "
+            "weak-group rule, which fires because the within-group AUC "
+            "there is 0.52, below our 0.60 limit. The two happen to point "
+            "at the same group.",
     },
     "rules": {
         "eyebrow": "STEPS 5 AND 6 \u00b7 WHEN A PERSON DECIDES, AND WHY",
@@ -155,11 +173,22 @@ CONTENT = {
             "Disagreement does not: 85.5 against 85.0, the model is "
             "actually slightly better there. Switching it on would have "
             "sent 2,257 of 7,738 cases to a person for nothing. That is "
-            "the control we rejected, and we rejected it on evidence. The "
-            "four zones below show where everything lands: two thirds "
-            "answered automatically, 14.9 percent reaching a person, and "
-            "every single over-61 case in safe-stop, where the system "
-            "gives no answer at all.",
+            "the control we rejected, and we rejected it on evidence. Note "
+            "what disagreement actually compares: both models run on every "
+            "applicant, and the rule fires when their two probabilities "
+            "differ by more than 0.50 - not the amounts, the "
+            "probabilities. The four zones below show where everything "
+            "lands. Sample audit is not a narrow band around the "
+            "threshold: it is every automatic refusal, so everything below "
+            "0.80 that no rule caught, and a tenth of that stream is read "
+            "by a person. The cases between 0.75 and 0.85 never get there "
+            "- the borderline rule pulls them into human review first. Two "
+            "thirds are answered automatically, 14.9 percent reach a "
+            "person, and every single over-61 case is in safe-stop, where "
+            "the system gives no answer at all. One word on the last "
+            "column: really approved is the share of people in that zone "
+            "who did get a loan in the data, the true label, not the "
+            "model's output.",
     },
     "contract": {
         "eyebrow": "STEP 7A \u00b7 THE CONTRACT: FIX THE NUMBERS BEFORE ASKING",
@@ -173,13 +202,24 @@ CONTENT = {
             "applicant's own data. The model may quote from that list and "
             "nothing else. Afterwards every number in the answer is "
             "matched back against it, and every citation against the "
-            "passages actually retrieved. Three results, all on 24 "
-            "questions over 4 applicants. Citations: the full system cites "
+            "passages actually retrieved. If a number or a citation fails "
+            "the check, the model gets one more try; if that fails too, a "
+            "fixed safe answer replaces its own. In 72 runs the fallback "
+            "was never needed. The three runs on the right are the "
+            "comparison: A is Qwen with the applicant's data only, B adds "
+            "our contract, C adds four retrieved passages on top. Only the "
+            "support changes, which is what makes it a fair test. Three "
+            "results, all on 24 questions over 4 applicants. Citations: "
+            "the full system cites "
             "a real source in 15 of 15 source questions, the other two "
             "runs in zero - exact McNemar p = 0.000061. Invented markers: "
             "when the runs have no sources, all 24 answers invent one "
             "anyway, p = 0.00000012. And 97.7 percent of the 131 figures "
-            "in run C trace back to something we computed.",
+            "in run C trace back to something we computed. If anyone asks "
+            "what p means: it is how likely a split this lopsided would be "
+            "if the two set-ups were really equally good. Below 0.05 we "
+            "call the difference real; 0.000061 means it would happen "
+            "about once in sixteen thousand times by chance.",
     },
     "language": {
         "eyebrow": "STEP 7B \u00b7 WHAT THE LANGUAGE MODEL DOES BY ITSELF",
