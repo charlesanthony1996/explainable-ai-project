@@ -1,8 +1,22 @@
-"""Three figures sized for a projector, not for reading at a desk.
+"""The figures for Michael's part of the deck, sized for a projector.
 
-The four overview diagrams are reference material: dense, every number on
-them, meant to be opened and studied. On a slide they are unreadable.
-These carry the same content in plain words and large type.
+The four overview diagrams in `overview_figure.py` are reference material:
+dense, every number on them, meant to be opened and studied. On a slide
+they are unreadable. These carry the same content in plain words and large
+type, and they follow the deck's own story:
+
+    folie_drei_schritte        14  the whole project in three steps
+    folie_plan                 15  the seven steps, control and evidence
+    folie_fairness_metrics     16  step 3: the four measures, defined
+    folie_equal_opportunity    17  step 4: the conflict, group by group
+    folie_regeln_zonen         18  steps 5 and 6: rules and zones
+    folie_contract             19  step 7a: the contract and the check
+    folie_sprachmodell         20  step 7b: what the model does by itself
+    folie_nicht_abgedeckt      21  what we did not cover
+
+`folie_messung` and `folie_governance` are kept because they summarise the
+same material on one page each, which is useful in the report and in the
+vault even though the deck now walks through it step by step.
 
 LINE SPACING IS COMPUTED, NOT GUESSED
 The first version placed text at eyeballed offsets and the lines collided.
@@ -146,6 +160,64 @@ def three_columns(axes, columns):
     flow(axes, *GUTTER[0], middle)
     flow(axes, *GUTTER[1], middle, columns[2][0])
     return bottom
+
+
+def table(axes, left, right, top, columns, rows, row_height=8.0,
+          head_size=10.0, body_size=11.0, highlight=None):
+    """A header strip and a stack of rows, laid out from column shares.
+
+    `columns` is a list of (heading, share, align) where share is the
+    position of the column across the table, 0 at the left edge and 1 at
+    the right. `rows` is a list of value lists. `highlight` is the index of
+    the row that gets the rust frame, or None.
+
+    Returns the y of the lowest thing drawn.
+    """
+
+    head_lines = max(head.count("\n") + 1 for head, _, _ in columns)
+    strip = line_units(head_size) * head_lines + 3.0
+    axes.add_patch(FancyBboxPatch(
+        (left, top - strip + 1.4), right - left, strip,
+        boxstyle="round,pad=0.3,rounding_size=1.0",
+        linewidth=0, facecolor=INK, zorder=2))
+    for head, share, align in columns:
+        axes.text(left + (right - left) * share, top - 0.4, head,
+                  ha=align, va="top", fontsize=head_size, color="#FFFFFF",
+                  fontweight="bold", zorder=5)
+
+    first = top - strip - 1.2
+    for place, values in enumerate(rows):
+        row_top = first - place * row_height
+        if place == highlight:
+            axes.add_patch(FancyBboxPatch(
+                (left, row_top - row_height + 2.4), right - left,
+                row_height - 0.9,
+                boxstyle="round,pad=0.3,rounding_size=1.0",
+                linewidth=1.8, edgecolor=RUST, facecolor="#FBEFE7",
+                zorder=1))
+        colour = RUST if place == highlight else INK
+        for value, (_, share, align) in zip(values, columns):
+            bold = value.isupper() and len(value) < 14
+            axes.text(left + (right - left) * share, row_top, value,
+                      ha=align, va="top", fontsize=body_size, color=colour,
+                      fontweight="bold" if bold or place == highlight
+                      else "normal", zorder=5)
+
+    return first - len(rows) * row_height
+
+
+def note_box(axes, left, right, top, height, colour, fill, strong, soft,
+             strong_size=11.5, soft_size=10.3):
+    """The closing box under a table: one bold line, then the detail."""
+
+    axes.add_patch(FancyBboxPatch(
+        (left, top - height), right - left, height,
+        boxstyle="round,pad=0.4,rounding_size=1.2",
+        linewidth=2.0, edgecolor=colour, facecolor=fill, zorder=1))
+    write(axes, left + 2.0, top - 1.4, strong, strong_size, INK, "bold")
+    write(axes, left + 2.0, top - 1.4 - line_units(strong_size) - 0.9, soft,
+          soft_size, MUTED)
+    return top - height
 
 
 def flow(axes, x_from, x_to, y, colour=MUTED):
@@ -312,6 +384,412 @@ def governance():
 
 
 # ------------------------------------------------------------------
+# The plan: the seven steps, what controls each, what proves it
+# ------------------------------------------------------------------
+
+# (control lines, step number and name, detail, evidence file, slide)
+PLAN_STEPS = [
+    (["Leakage scan: RiskScore removed",
+      "Preprocessor fitted on train only"],
+     "1 · Data", "52,000 + 20,000 rows, synthetic",
+     "datasheet.md", None),
+    (["A larger amount may only lower P",
+      "Test set used exactly once"],
+     "2 · Models A + B", "monotonic forest, isotonic calibration",
+     "model_card.md", None),
+    (["Tolerance declared before the numbers",
+      "The interval decides, not the point"],
+     "3 · Fairness measured", "per age group, with intervals",
+     "parity_table_with_intervals.csv", "16"),
+    (["Equal opportunity chosen",
+      "The loss stated, not hidden"],
+     "4 · Conflict decided", "predictive parity holds, the others fail",
+     "governance_decision.md", "17"),
+    (["An evidence rule needs a measured",
+      "accuracy drop of at least 0.03"],
+     "5 · Rules chosen", "3 safety + 2 evidence rules → 4 active",
+     "deferral_rule_choice.csv", "18"),
+    (["10% of the rejections are audited",
+      "safe-stop: the system answers nothing"],
+     "6 · Four zones", "auto-accept / audit / review / safe-stop",
+     "control_zones.csv", "18"),
+    (["The model never computes a figure",
+      "The check runs in code, not in the prompt"],
+     "7 · Answer checked", "every number, every citation",
+     "evaluation_*.csv", "19 20"),
+]
+
+TOLERANCES = [
+    ("Demographic parity ratio", "at least 0.80", "four-fifths rule (EEOC)"),
+    ("Demographic parity difference", "at most 0.10", "set by the project"),
+    ("Equal opportunity difference", "at most 0.10", "set by the project"),
+    ("Predictive parity difference", "at most 0.10", "set by the project"),
+]
+
+
+def plan():
+    figure, axes = canvas()
+    write(axes, 50, 98.0, "The plan: seven steps, each one controlled "
+                          "and each one evidenced",
+          14.5, INK, "bold", "center")
+    write(axes, 50, 93.0,
+          "Accountable: Michael Aichinger and Charles Anthony jointly  |  "
+          "No review planned: the project ends at submission",
+          10.0, MUTED, "normal", "center")
+
+    # The tolerance strip. It belongs at the top because it is what makes
+    # the next three slides judgeable: the limits were written down before
+    # the numbers were computed.
+    axes.add_patch(FancyBboxPatch(
+        (2.0, 77.0), 96.0, 10.0,
+        boxstyle="round,pad=0.4,rounding_size=1.2",
+        linewidth=1.8, edgecolor=MUTED, facecolor="#EFEDE7", zorder=1))
+    write(axes, 50, 86.0,
+          "DECLARED IN ADVANCE  —  a measure counts as breached only "
+          "when the WHOLE interval lies outside the tolerance",
+          10.3, INK, "bold", "center")
+    for place, (name, limit, source) in enumerate(TOLERANCES):
+        x = 5.0 + place * 23.5
+        write(axes, x, 82.3, name, 9.6, INK, "bold")
+        write(axes, x, 79.3, limit + "   " + source, 9.0, MUTED)
+
+    write(axes, 20.0, 73.0, "CONTROL", 10.5, RUST, "bold", "right")
+    write(axes, 50.0, 73.0, "THE PATH", 10.5, INK, "bold", "center")
+    write(axes, 69.0, 73.0, "EVIDENCE", 10.5, GREEN, "bold")
+
+    row = 9.3
+    first = 68.0
+    for place, step in enumerate(PLAN_STEPS):
+        controls, name, detail, evidence, slide = step
+        top = first - place * row
+        axes.add_patch(FancyBboxPatch(
+            (31.0, top - row + 1.6), 36.0, row - 1.0,
+            boxstyle="round,pad=0.3,rounding_size=1.0",
+            linewidth=1.8, edgecolor=BLUE, facecolor="#FFFFFF", zorder=2))
+        write(axes, 49.0, top - 0.5, name, 11.0, BLUE, "bold", "center")
+        write(axes, 49.0, top - 0.5 - line_units(11.0), detail,
+              9.4, MUTED, "normal", "center")
+
+        for line, text in enumerate(controls):
+            write(axes, 29.5, top - 0.3 - line * line_units(9.0), text,
+                  9.0, RUST, "normal", "right")
+
+        write(axes, 68.5, top - 0.3, evidence, 9.0, GREEN)
+        if slide:
+            write(axes, 68.5, top - 0.3 - line_units(9.0),
+                  "proved on slide " + slide.replace(" ", " and "),
+                  9.0, INK, "bold")
+        else:
+            write(axes, 68.5, top - 0.3 - line_units(9.0),
+                  "covered by the team", 9.0, MUTED, "normal", "left",
+                  "italic")
+
+    axes.set_ylim(first - len(PLAN_STEPS) * row - 1.0, 100)
+    return figure
+
+
+# ------------------------------------------------------------------
+# Step 3 · the four fairness measures
+# ------------------------------------------------------------------
+
+def fairness_metrics():
+    figure, axes = canvas()
+    write(axes, 50, 97.0,
+          "Step 3: four measures of fairness, three of them breached",
+          15, INK, "bold", "center")
+    write(axes, 50, 91.5,
+          "Model A, dataset 1, cut-off 0.5. Reference group 31-45, the one "
+          "the model treats best.",
+          11.0, MUTED, "normal", "center")
+
+    columns = [
+        ("Measure", 0.00, "left"),
+        ("The question it asks", 0.24, "left"),
+        ("Value", 0.645, "center"),
+        ("95% interval", 0.75, "center"),
+        ("Allowed", 0.86, "center"),
+        ("Verdict", 1.00, "right"),
+    ]
+    rows = [
+        ["Demographic parity (diff.)",
+         "Is every group approved equally often?",
+         "0.834", "0.822 – 0.845", "≤ 0.10", "BREACHED"],
+        ["Demographic parity (ratio)",
+         "The same as a ratio — four-fifths rule",
+         "0.000", "0.000 – 0.000", "≥ 0.80", "BREACHED"],
+        ["Equal opportunity (diff.)",
+         "Of those who would repay, who gets through?",
+         "0.966", "0.959 – 0.973", "≤ 0.10", "BREACHED"],
+        ["Predictive parity (diff.)",
+         "When it says yes, is it right as often?",
+         "0.005", "0.004 – 0.038", "≤ 0.10", "HOLDS"],
+    ]
+    bottom = table(axes, 2.0, 97.0, 85.0, columns, rows,
+                   row_height=9.2, head_size=10.0, body_size=10.0,
+                   highlight=2)
+
+    write(axes, 2.0, bottom - 1.0,
+          r"$\mathrm{EOD} = \max_g TPR_g - \min_g TPR_g$, "
+          r"where $TPR_g$ is the share of the really-approved in group "
+          r"$g$ that the model approves too",
+          10.0, INK)
+    write(axes, 2.0, bottom - 5.0,
+          r"$\mathrm{DPR} = \min_g \hat{p}_g \,/\, \max_g \hat{p}_g$, "
+          r"where $\hat{p}_g$ is the share of group $g$ the model approves",
+          10.0, INK)
+
+    note_box(axes, 2.0, 97.0, bottom - 11.0, 13.5, GREEN, "#F3F8F5",
+             "One measure holds and three fail — so a choice is "
+             "unavoidable, and it has to be written down.",
+             "2,000 bootstrap resamples, seed 42. On dataset 2 the groups "
+             "are smaller and 4 of the 8 measures stay undecided: their "
+             "interval\nstraddles the tolerance, so the honest answer is "
+             "\"not enough data\", not \"fair\".")
+    axes.set_ylim(bottom - 26.5, 100)
+    return figure
+
+
+# ------------------------------------------------------------------
+# Steps 5 and 6 · which rules are on, and where every case goes
+# ------------------------------------------------------------------
+
+def rules_and_zones():
+    figure, axes = canvas()
+    write(axes, 50, 98.0,
+          "Steps 5 and 6: which rules send a case to a person, "
+          "and where it lands",
+          14.5, INK, "bold", "center")
+
+    write(axes, 2.0, 92.0, "THE FIVE CANDIDATE RULES", 10.5, RUST, "bold")
+    columns = [
+        ("Rule", 0.00, "left"),
+        ("Type", 0.19, "left"),
+        ("What it catches", 0.30, "left"),
+        ("Catches", 0.685, "center"),
+        ("Accuracy there", 0.795, "center"),
+        ("Overall", 0.90, "center"),
+        ("", 1.00, "right"),
+    ]
+    rows = [
+        ["missing data", "safety", "a required field is empty",
+         "0.0%", "—", "—", "ON"],
+        ["unusual input", "safety", "a value outside the training range",
+         "7.9%", "—", "—", "ON"],
+        ["weak group", "safety", "a group the model is poor on",
+         "5.0%", "—", "—", "ON"],
+        ["borderline", "evidence", "probability sits near the cut-off",
+         "1.1%", "77.7%", "85.0%", "ON"],
+        ["disagreement", "evidence", "models A and B do not agree",
+         "29.2%", "85.5%", "85.0%", "OFF"],
+    ]
+    bottom = table(axes, 2.0, 97.0, 86.0, columns, rows,
+                   row_height=6.6, head_size=9.4, body_size=10.0,
+                   highlight=4)
+
+    write(axes, 2.0, bottom - 0.6,
+          "An evidence rule goes on only where the model is measurably "
+          "worse — at least 0.03 below overall accuracy:",
+          10.2, INK, "bold")
+    write(axes, 2.0, bottom - 4.4,
+          "borderline  85.0 − 77.7 = 7.3 points → ON          "
+          "disagreement  85.0 − 85.5 = −0.5 points → OFF",
+          10.0, MUTED)
+    write(axes, 2.0, bottom - 7.8,
+          "Switching disagreement on would have sent 2,257 of 7,738 cases "
+          "to a person, where the model was no worse.",
+          10.0, MUTED)
+
+    write(axes, 2.0, bottom - 13.5, "WHERE EVERY CASE GOES  ·  "
+          "7,800 TEST APPLICANTS", 10.5, BLUE, "bold")
+    zone_columns = [
+        ("Zone", 0.00, "left"),
+        ("What it means", 0.155, "left"),
+        ("Cases", 0.585, "center"),
+        ("Share", 0.685, "center"),
+        ("Sees a person", 0.795, "center"),
+        ("Really approved", 1.00, "right"),
+    ]
+    zone_rows = [
+        ["auto-accept", "answered without anyone looking",
+         "5,156", "66.1%", "0", "84.7%"],
+        ["sample audit", "a 10% sample is read afterwards",
+         "1,648", "21.1%", "165", "14.1%"],
+        ["human review", "a person decides together with the model",
+         "68", "0.9%", "68", "79.4%"],
+        ["safe-stop", "no basis at all — the system gives no answer",
+         "928", "11.9%", "928", "37.9%"],
+    ]
+    lowest = table(axes, 2.0, 97.0, bottom - 19.0, zone_columns, zone_rows,
+                   row_height=6.6, head_size=9.4, body_size=10.0,
+                   highlight=3)
+
+    write(axes, 2.0, lowest - 0.6,
+          "1,161 of 7,800 cases reach a person — 14.9%. "
+          "Of the over-61: 100% safe-stop, not one automatic answer.",
+          10.6, INK, "bold")
+    axes.set_ylim(lowest - 6.5, 100)
+    return figure
+
+
+# ------------------------------------------------------------------
+# Step 7a · the contract and the check
+# ------------------------------------------------------------------
+
+def contract_figure():
+    figure, axes = canvas()
+    write(axes, 50, 97.0,
+          "Step 7a: the numbers are fixed before the model is asked",
+          15, INK, "bold", "center")
+
+    bottom = three_columns(axes, [
+        (BLUE, "THE CONTRACT", "Written before the answer", [
+            ("Every figure it may say",
+             "a list built from the models,\nnot from the model's memory"),
+            ("What goes in",
+             "probabilities, the maximum amount,\nthe SHAP shares, the "
+             "applicant's data"),
+            ("What never goes in",
+             "anything the assistant would\nhave to work out itself"),
+        ], None),
+        (RUST, "THE CHECK", "Afterwards, in code", [
+            ("Every number matched",
+             "against the list, 1% relative or\n0.005 absolute tolerance"),
+            ("Every citation matched",
+             "against the passages that were\nactually retrieved"),
+            ("Two tries, then a safe answer",
+             "the fallback answer was never\nneeded in 72 runs"),
+        ], None),
+        (GREEN, "WHAT IT PROVED", "24 questions, 4 applicants", [
+            ("Citations: 15 of 15",
+             "run C only. A and B: 0 of 15.\nExact McNemar p = 0.000061"),
+            ("Invented markers: 24 of 24",
+             "in both runs without sources.\np = 0.00000012"),
+            ("Grounded figures: 97.7%",
+             "run C, 131 figures checked.\nRun A: 87.2% of 39"),
+        ], "#F3F8F5"),
+    ])
+
+    footline(axes, bottom,
+             "The contract is what makes the measurement possible at all.",
+             "A number is then right or wrong against a file, not against "
+             "an opinion — so no human judgement is needed to mark it.")
+    return figure
+
+
+# ------------------------------------------------------------------
+# Step 7b · what the language model does on its own
+# ------------------------------------------------------------------
+
+def language_model():
+    figure, axes = canvas()
+    write(axes, 50, 97.0,
+          "Step 7b: three things only the language model can be blamed for",
+          15, INK, "bold", "center")
+
+    bottom = three_columns(axes, [
+        (RUST, "THE PROMPT", "The same rule, written twice", [
+            ("Version 1 · the principle",
+             "\"Cite the source it came from.\"\nResult: 0 of 15"),
+            ("Version 2 · the place",
+             "\"End every paragraph with the\nmarker, like [2].\" "
+             "Result: 15 of 15"),
+            ("And the cost",
+             "the runs with no sources now\ninvent markers: 24 of 24"),
+        ], None),
+        (BLUE, "THE AGE TEST", "Same case, two ages", [
+            ("Every model figure frozen",
+             "sent as 30 and as 67; a difference\ncan only come from the "
+             "words"),
+            ("Age brought up",
+             "5 times for the 67-year-old,\n1 time for the 30. p = 0.219"),
+            ("Discouraging language",
+             "no difference at all: 2 against 2.\n24 pairs is too few to "
+             "be sure"),
+        ], None),
+        (GREEN, "THE HUMAN RATING", "What no code can judge", [
+            ("Two readers, blind",
+             "24 answers shuffled, the run label\nhidden, scored 0, 1 or 2"),
+            ("Correctness, out of 2",
+             "A 1.06   B 1.50   C 1.44\nthe contract makes it right"),
+            ("Clarity, out of 2",
+             "A 1.81   B 1.19   C 1.38\nand harder to read"),
+        ], "#F3F8F5"),
+    ])
+
+    footline(axes, bottom,
+             "Grounding buys correctness and costs readability. "
+             "That is a design problem, not a bug.",
+             "Cohen's κ = −0.04: one reader simply stricter. 75% "
+             "agreed within one point, and both ranked the runs alike.")
+    return figure
+
+
+# ------------------------------------------------------------------
+# What we did not cover
+# ------------------------------------------------------------------
+
+NOT_COVERED = [
+    ("No operating owner after submission",
+     "The project ends with the hand-in. Nobody is on call for it, and we "
+     "say so rather than imply otherwise."),
+    ("No review date",
+     "A real system would be re-measured on a schedule. Ours will not be, "
+     "because there will be no ours."),
+    ("Delay and override quality not measurable",
+     "No person ever worked a case, so we cannot say how long review takes "
+     "or how often a human would overrule the model."),
+    ("Learning-to-defer not implemented",
+     "The rules decide who defers. A model that learns when to defer would "
+     "be the next step, and we did not take it."),
+    ("Both datasets are synthetic",
+     "Every number here describes invented people. On real applicant data "
+     "the whole record would have to be redone."),
+    ("The 0.10 tolerance was set, not derived",
+     "We declared it before measuring, which keeps it honest, but no "
+     "regulation or study fixes it at that value."),
+]
+
+
+def not_covered():
+    figure, axes = canvas()
+    write(axes, 50, 97.0,
+          "What this record does NOT cover — said out loud, "
+          "not left quiet",
+          15, RUST, "bold", "center")
+    write(axes, 50, 91.0,
+          "A governance record that only lists what went well is not a "
+          "governance record.",
+          11.5, MUTED, "normal", "center", "italic")
+
+    axes.add_patch(FancyBboxPatch(
+        (2.0, 29.0), 96.0, 55.0,
+        boxstyle="round,pad=0.5,rounding_size=1.5",
+        linewidth=2.4, edgecolor=RUST, facecolor="#FBEFE7", zorder=1))
+
+    top = 80.0
+    for place, (headline, detail) in enumerate(NOT_COVERED):
+        column, row = place % 2, place // 2
+        x = 5.0 + column * 47.0
+        y = top - row * 19.0
+        write(axes, x, y, str(place + 1) + "  " + headline,
+              11.8, INK, "bold")
+        write(axes, x + 2.5, y - line_units(11.8) - 0.8,
+              wrap(detail, 46), 10.2, MUTED)
+
+    write(axes, 50, 25.0,
+          "Source: provenance.json, governance_decision.md",
+          10.0, MUTED, "normal", "center")
+    axes.set_ylim(20.0, 100)
+    return figure
+
+
+def wrap(text, width):
+    """Break a sentence into lines of at most `width` characters."""
+    import textwrap
+    return "\n".join(textwrap.wrap(text, width))
+
+
+# ------------------------------------------------------------------
 # 4 · Equal opportunity, group by group
 # ------------------------------------------------------------------
 
@@ -446,10 +924,17 @@ def make_slide_figures():
     check_equal_opportunity_rows()
     FIGURES_FOLDER.mkdir(parents=True, exist_ok=True)
 
-    for drawer, name in [(three_steps, "folie_drei_schritte.png"),
-                         (measurement, "folie_messung.png"),
-                         (governance, "folie_governance.png"),
-                         (equal_opportunity, "folie_equal_opportunity.png")]:
+    for drawer, name in [
+            (three_steps, "folie_drei_schritte.png"),
+            (plan, "folie_plan.png"),
+            (fairness_metrics, "folie_fairness_metrics.png"),
+            (equal_opportunity, "folie_equal_opportunity.png"),
+            (rules_and_zones, "folie_regeln_zonen.png"),
+            (contract_figure, "folie_contract.png"),
+            (language_model, "folie_sprachmodell.png"),
+            (not_covered, "folie_nicht_abgedeckt.png"),
+            (measurement, "folie_messung.png"),
+            (governance, "folie_governance.png")]:
         figure = drawer()
         path = FIGURES_FOLDER / name
         figure.savefig(path, dpi=200, bbox_inches="tight", facecolor=PAPER)

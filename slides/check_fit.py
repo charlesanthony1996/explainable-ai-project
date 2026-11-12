@@ -1,4 +1,4 @@
-"""Does every string fit the box it was put in?
+﻿"""Does every string fit the box it was put in?
 
 No renderer here, so fit is estimated from the box width and the font size
 on the run: roughly 1.9 characters per 0.1 inch at 11pt, scaled by size.
@@ -12,10 +12,10 @@ from pptx.util import Emu
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-pres = Presentation("Trustworthy Loan Assessment Assistant - 19 slides.pptx")
+pres = Presentation("Trustworthy Loan Assessment Assistant - 22 slides.pptx")
 
 problems = 0
-for number in range(14, 20):
+for number in range(14, 23):
     slide = pres.slides[number - 1]
     print("=== slide", number)
     for shape in slide.shapes:
@@ -49,3 +49,4 @@ for number in range(14, 20):
             print("      ", text[:70])
 print()
 print("overflows:", problems)
+
