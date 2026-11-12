@@ -1,37 +1,23 @@
-﻿"""Build Michael's part of the team deck: slides 14 to 22.
+﻿"""Build Michael's part of the team deck: slides 14 to 19.
+
+EVERYTHING ON THESE SLIDES IS REAL POWERPOINT TEXT.
+No picture carries a word of it. Titles, statements, table cells and the
+closing message are all text boxes and native PowerPoint tables, so every
+word can be changed in PowerPoint without coming back here.
+
+Six slides, about fifty seconds each, for a five-minute slot:
+
+    14  the path          two things had to be proved, steps 1 to 7
+    15  step 3            fairness measured four ways
+    16  step 4            why we follow equal opportunity
+    17  steps 5 and 6     which rules fire, and where cases land
+    18  step 7            the contract, and what the check proved
+    19  the limits        the numbers we chose ourselves
+
+The wording is deliberately plain. Short sentences, no clause stacking,
+no words that need a second language to parse.
 
 Slides 1 to 13 are the team's and are not touched.
-
-The story is one path with its proofs. Slide 15 is the guiding slide: the
-seven steps, what controls each one, and which file proves it. Every slide
-after it redeems one of those promises, in the same order, and each of them
-answers the same four questions:
-
-    WHAT IT IS        the definition, in words
-    WHAT WE DID       the method and the sample
-    THE RESULT        the numbers, in a table
-    THE DECISION      what follows from them
-
-    14  the whole project in three steps
-    15  THE PLAN - seven steps, control and evidence
-    16  step 3: the four fairness measures
-    17  step 4: the conflict, group by group
-    18  steps 5 and 6: rules and zones
-    19  step 7a: the contract and the check
-    20  step 7b: what the language model does by itself
-    21  what this record does not cover
-    22  SHAP - hidden, kept for the question round
-
-Most slides carry a full-width figure drawn by `uv run main.py slides`.
-Those keep the small eyebrow line and the source line but drop the title
-box, because each figure already carries its own heading; two headings
-stacked would only eat the height the figure needs.
-
-Templates are borrowed from the deck itself. Character budgets measured
-from them: block label <= 43, block text <= 95, closing line <= 78, stat
-value <= 11, stat caption <= 73, note <= 200, column label <= 19, column
-text <= 76, wide block <= 292. check_fit.py is what enforces this, since
-there is no renderer on this machine.
 """
 
 import copy
@@ -46,276 +32,359 @@ SKILL = Path(r"C:\Users\micha\.claude\skills\synced"
              r"\c686bb79-314b-47fc-8cc8-15198ef780ba_5531554f-ae05-4653-aabd-8a71abc2b30c"
              r"\pptx")
 UV = r"C:\Users\micha\.local\bin\uv.exe"
-FIGURES = Path(r"C:\explainable-ai-project\results\figures")
 
-PLAN = [
-    ("13", "story"),
-    ("13", "theplan"),
-    ("13", "fairness"),
-    ("13", "conflict"),
-    ("13", "rules"),
-    ("13", "contract"),
-    ("13", "language"),
-    ("13", "notcovered"),
-    ("13", "shap"),
+# The deck's own colours.
+INK = "14213D"
+PAPER = "F7F5F0"
+MUTED = "4D566A"
+RUST = "B5541A"
+BLUE = "2F6FB3"
+GREEN = "1F7A4D"
+WHITE = "FFFFFF"
+TINT_RUST = "FBEFE7"
+TINT_GREEN = "F3F8F5"
+TINT_GREY = "EFEDE7"
+
+SLIDE_WIDTH = 13.333
+MARGIN = 0.89
+BODY_WIDTH = SLIDE_WIDTH - 2 * MARGIN
+
+
+# ------------------------------------------------------------------
+# The content. Everything below is just words and numbers.
+# ------------------------------------------------------------------
+
+SLIDES = [
+    {
+        "key": "path",
+        "eyebrow": "MY PART \u00b7 STEP BY STEP",
+        "title": "Two things to prove",
+        "statement": "Is it fair?      \u00b7      Does it hand over when it "
+                     "does not know?",
+        "table": {
+            "columns": [1.5, 4.2, 7.35],
+            "header": ["Step", "What", "Key point"],
+            "rows": [
+                ["1 \u2013 2", "Data and models", "team, slides 3 and 5"],
+                ["3", "Measure fairness", "limits set first"],
+                ["4", "Choose the fairness rule", "three fail, one holds"],
+                ["5", "Rules: who goes to a person", "evidence, not taste"],
+                ["6", "Four zones", "from automatic to stop"],
+                ["7", "Check the model's answer", "numbers and citations"],
+            ],
+            "highlight": None,
+        },
+        "message": "Limits written down BEFORE measuring \u00b7 broken only "
+                   "if the WHOLE range falls outside",
+        "message_colour": GREEN,
+        "source": "Source: governance_decision.md \u00b7 14",
+        "notes":
+            "My part starts at step 3. Steps 1 and 2 are the team's slides "
+            "3 and 5, so I will not repeat them. One thing to stress here: "
+            "we wrote the limits down before we measured anything. And a "
+            "measure only counts as broken when the whole confidence "
+            "range sits outside the limit, not just the middle value. That "
+            "is what stops us from moving the goalposts after seeing the "
+            "numbers.",
+    },
+    {
+        "key": "measures",
+        "eyebrow": "STEP 3 \u00b7 MEASURING FAIRNESS",
+        "title": "Fairness is not one number. We measured four.",
+        "statement": None,
+        "table": {
+            "columns": [3.3, 5.05, 1.3, 1.9, 1.5],
+            "row_height": 0.50,
+            "header": ["Measure", "Asks", "Result", "Limit", ""],
+            "rows": [
+                ["Demographic parity\n(difference)",
+                 "Same approval rate in every age group?",
+                 "0.834", "0.10 or less", "FAILS"],
+                ["Demographic parity\n(ratio)",
+                 "Four-fifths rule (EEOC)",
+                 "0.000", "0.80 or more", "FAILS"],
+                ["Equal opportunity",
+                 "Of those who would repay \u2014 who gets through?",
+                 "0.966", "0.10 or less", "FAILS"],
+                ["Predictive parity",
+                 "A \"yes\" equally often right?",
+                 "0.005", "0.10 or less", "HOLDS"],
+            ],
+            "highlight": 2,
+        },
+        "message": "Three fail, one holds \u00b7 all four at once is "
+                   "impossible when groups truly differ \u00b7 so we chose",
+        "message_colour": GREEN,
+        "source": "Source: parity_table_with_intervals.csv \u00b7 15",
+        "notes":
+            "Fairness is not one thing, so we measured four. Demographic "
+            "parity asks whether every group is approved as often. Equal "
+            "opportunity asks only about the people who would really "
+            "repay. Predictive parity asks whether a yes means the same in "
+            "every group. Three fail and one holds. Every number here has "
+            "a confidence range behind it from 2,000 resamples, and we "
+            "only call a measure broken when the whole range is outside "
+            "the limit. If anyone asks about the second dataset: the "
+            "groups there are much smaller, 120 older applicants instead "
+            "of 390, and five of the eight measures stay undecided. "
+            "Undecided is not the same as fair, and we report it that way.",
+    },
+    {
+        "key": "choice",
+        "eyebrow": "STEP 4 \u00b7 THE CHOICE",
+        "title": "We follow equal opportunity",
+        "reasons": [
+            ("Predictive parity",
+             "already holds — nothing to choose"),
+            ("Demographic parity",
+             "same rate for all. But groups truly differ: 73.1% approved "
+             "at 31-45, only 15.4% at 61+ → would mean saying yes to "
+             "people who cannot repay"),
+            ("Equal opportunity",
+             "only those who would have repaid — the harm that counts"),
+        ],
+        "table": {
+            "columns": [2.6, 2.3, 3.3, 3.35],
+            "header": ["Age group", "People",
+                       "Really approved",
+                       "Of those, model finds"],
+            "rows": [
+                ["18-30", "1,888", "63.3%", "92.2%"],
+                ["31-45", "3,989", "73.1%", "96.6%"],
+                ["46-60", "1,533", "54.3%", "88.7%"],
+                ["61+", "390", "15.4%", "0.0%"],
+            ],
+            "highlight": 3,
+        },
+        "message": "Younger groups 0.079 apart, inside the limit \u00b7 "
+                   "problem is 61+ alone \u00b7 removing age: 0.966 before, "
+                   "0.966 after",
+        "message_colour": RUST,
+        "source": "Source: parity_by_group_with_intervals.csv \u00b7 16",
+        "notes":
+            "Why this measure and not another. Predictive parity already "
+            "holds, so there is nothing to decide. Demographic parity "
+            "would force the same approval rate in every group, but the "
+            "groups really are different - 73 percent of the middle group "
+            "were approved and only 15 percent of the oldest. Forcing "
+            "equal rates would mean approving people who cannot repay, "
+            "which helps nobody. Equal opportunity only looks at the "
+            "people who would have repaid, and asks whether each group "
+            "gets through equally. That is the harm that counts. The table "
+            "shows what happens: 92, 97 and 89 percent in the three "
+            "younger groups, and zero in the oldest. Of 390 older "
+            "applicants, 60 really did get a loan, and the model approves "
+            "none of them.",
+    },
+    {
+        "key": "rules",
+        "eyebrow": "STEPS 5 AND 6 \u00b7 WHO DECIDES",
+        "title": "The model decides only where it is good enough",
+        "statement": "Rule switched on only if the model is 0.03 worse on "
+                     "the cases it catches",
+        "table": {
+            "columns": [2.5, 4.75, 1.6, 1.6, 1.1],
+            "row_height": 0.29,
+            "head_height": 0.34,
+            "header": ["Rule", "Fires when",
+                       "Right there", "Overall", "Used?"],
+            "rows": [
+                ["missing data", "a required field is empty",
+                 "\u2014", "\u2014", "YES"],
+                ["unusual input", "value outside the normal range",
+                 "\u2014", "\u2014", "YES"],
+                ["weak group", "cannot rank this group \u2014 AUC under 0.60",
+                 "\u2014", "\u2014", "YES"],
+                ["borderline", "chance between 0.75 and 0.85",
+                 "77.7%", "85.0%", "YES"],
+                ["disagreement", "the two models differ by over 0.50",
+                 "85.5%", "85.0%", "NO"],
+            ],
+            "highlight": 4,
+        },
+        "table2": {
+            "columns": [2.5, 1.8, 7.25],
+            "row_height": 0.29,
+            "head_height": 0.34,
+            "header": ["Zone", "Share", "Who looks"],
+            "rows": [
+                ["auto-accept", "66.1%", "nobody"],
+                ["sample audit", "21.1%", "1 in 10 read afterwards"],
+                ["human review", "0.9%", "person decides with the model"],
+                ["safe-stop", "11.9%", "no number is given at all"],
+            ],
+            "highlight": 3,
+        },
+        "message": "14.9% reach a person \u00b7 61+: 100%, as safe-stop "
+                   "\u00b7 at AUC 0.52 no number beats a bad number",
+        "message_colour": RUST,
+        "source": "Source: deferral_rule_choice.csv, control_zones.csv \u00b7 17",
+        "notes":
+            "Five rules were candidates. Three are safety rules and are "
+            "always on. Two had to earn their place: a rule is only used "
+            "if the model is clearly worse on the cases it catches. "
+            "Borderline qualifies, 77.7 against 85.0 overall. Disagreement "
+            "does not - 85.5 against 85.0, the model is actually slightly "
+            "better there - so it is off. Switching it on would have sent "
+            "2,257 of 7,738 cases to a person for nothing. That is a "
+            "control we rejected on evidence, not on taste. The four zones "
+            "show where everything lands. Two points people ask about. "
+            "Sample audit is every automatic refusal, not a narrow band, "
+            "and the 10 percent is a rule we set - nobody actually read "
+            "them, there was no person in the loop. And safe-stop is not "
+            "the same as human review: review means the model gives a "
+            "number and a person checks it, safe-stop means the model has "
+            "no basis at all and gives no number. The over-61 are in "
+            "safe-stop because a number they could anchor on would be "
+            "worse than none. One more thing worth saying: the fairness "
+            "choice and the weak-group rule are separate. Equal "
+            "opportunity is what we report against; the AUC rule is what "
+            "actually stops the case. They happen to point at the same "
+            "group.",
+    },
+    {
+        "key": "contract",
+        "eyebrow": "STEP 7 \u00b7 CHECKING THE ANSWER",
+        "title": "Our numbers may be quoted. Never invented.",
+        "steps": [
+            ("1 \u00b7 CONTRACT  \u2014  written first",
+             "applicant data \u00b7 computed chances \u00b7 largest amount "
+             "\u00b7 SHAP shares\n\nNothing else allowed in the answer."),
+            ("2 \u00b7 QWEN  \u2014  writes the answer",
+             "turns the list into sentences\n\nRun C also gets 4 passages: "
+             "EU AI Act \u00b7 EBA \u00b7 our reports"),
+            ("3 \u00b7 CHECK  \u2014  in code, afterwards",
+             "every number against the list\nevery citation against the "
+             "passages\n\nFails \u2192 1 retry \u2192 fixed safe answer. "
+             "Never needed in 72 runs."),
+        ],
+        "table": {
+            "columns": [5.35, 2.0, 2.0, 2.2],
+            "header": ["24 questions \u00b7 4 applicants",
+                       "A: data only", "B: + contract", "C: + sources"],
+            "rows": [
+                ["Source questions with a real citation",
+                 "0 of 15", "0 of 15", "15 of 15"],
+                ["Answers with a made-up citation mark",
+                 "24 of 24", "24 of 24", "0"],
+            ],
+            "highlight": None,
+        },
+        "message": "Citations only where real sources exist \u00b7 without "
+                   "them the model invents the look of a source \u2014 in "
+                   "every single answer",
+        "message_colour": BLUE,
+        "source": "Source: contract.py, evaluation_mcnemar.csv \u00b7 18",
+        "notes":
+            "This is the design choice that makes the language part "
+            "measurable at all. The model never computes anything. Before "
+            "it is asked, the code writes down every figure the answer is "
+            "allowed to contain, and afterwards the code checks the answer "
+            "against that list. Three runs, same questions, same model: A "
+            "gets the applicant's data only, B adds our contract, C adds "
+            "four retrieved passages. Only the support changes, which is "
+            "what makes the test fair. Two results. Citations appear only "
+            "in run C, 15 of 15 against 0 of 15. And the uncomfortable "
+            "one: when there are no sources, the model invents a citation "
+            "mark anyway, in all 24 answers. A prompt rule produced the "
+            "shape of a citation without the substance. Both differences "
+            "are far beyond chance - the p values are 0.000061 and "
+            "0.00000012, which means a split like this would almost never "
+            "happen if the set-ups were equally good.",
+    },
+    {
+        "key": "limits",
+        "eyebrow": "THE LIMITS",
+        "title": "Four numbers in this talk we chose ourselves",
+        "statement": None,
+        "table": {
+            "columns": [3.5, 2.2, 7.85],
+            "header": ["What", "Value", "Where it comes from"],
+            "rows": [
+                ["Fairness limit", "0.10",
+                 "we set it \u2014 no rule or study fixes this value"],
+                ["Weak-group limit", "AUC 0.60",
+                 "we set it \u2014 0.50 is guessing, so under 0.60 is near "
+                 "guessing"],
+                ["Audit share", "10%",
+                 "we set it \u2014 and nobody ever did it: no person in "
+                 "the loop"],
+                ["The data", "synthetic",
+                 "invented people \u2014 real data means redoing all of "
+                 "this"],
+            ],
+            "highlight": None,
+        },
+        "message": "Also missing: no owner after hand-in \u00b7 no review "
+                   "planned \u00b7 learning-to-defer not built",
+        "message_colour": RUST,
+        "source": "Source: provenance.json, governance_decision.md \u00b7 19",
+        "notes":
+            "I want to end here rather than on the results. Four numbers "
+            "in this talk are ours, not derived from anything: the 0.10 "
+            "fairness limit, the 0.60 AUC limit, the 10 percent audit "
+            "share, and the fact that both datasets are synthetic. "
+            "Declaring them in advance keeps them honest, but they are "
+            "still our choices. And three things are simply missing: "
+            "nobody owns this after the hand-in, no review is planned, and "
+            "we did not build a model that learns when to defer. A "
+            "governance record that lists only what went well is not a "
+            "governance record.",
+    },
 ]
 
-# Slides that are in the file but not shown when presenting.
-HIDDEN = {"shap"}
 
-# A figure slide: no title box, the picture fills the space between the
-# eyebrow and the source line. Given as a box rather than a width, because
-# the figures do not all have the same shape - the picture is scaled to fit
-# and centred inside it. Eyebrow ends at 1.15, source starts at 6.82.
-WIDE = "fit:1.22,11.90,5.35"
+# ------------------------------------------------------------------
+# Building
+# ------------------------------------------------------------------
 
-CONTENT = {
-    "story": {
-        "eyebrow": "THE SYSTEM AS A WHOLE \u00b7 MY PART IS MARKED",
-        "source": "Source: slide_figures.py, run_all.sh \u00b7 14",
-        "figure": ("folie_drei_schritte.png", WIDE),
-        "notes":
-            "The whole system in one picture, so you can see where my part "
-            "sits. Steps 1 and 2 are the team's model work: two forests on "
-            "72,000 past applications, and for one applicant the largest "
-            "amount that still reaches an 80% chance, with the SHAP "
-            "reasons. The marked items are mine - inside step 2, the rules "
-            "that decide whether a machine may answer at all, and then the "
-            "whole of step 3. That is where most of my time went: checking "
-            "that the result is fair, that the explanation is honest, and "
-            "writing the decisions down. Without step 3 the system is only "
-            "plausible. With it, every claim in the next seven slides can "
-            "be checked against a file.",
-    },
-    "theplan": {
-        "eyebrow": "CHECK AND GOVERNANCE \u00b7 EVERY STEP HAS A CONTROL AND A PROOF",
-        "source": "Source: governance_decision.md, provenance.json \u00b7 15",
-        "figure": ("folie_plan.png", WIDE),
-        "notes":
-            "This is the slide everything else hangs off. Read it in three "
-            "columns. The middle is what was done, in order. The left is "
-            "the control on that step - the rule we gave ourselves before "
-            "doing it. The right is the file that proves it happened, and "
-            "which slide shows it. Two things to point out. First, the "
-            "tolerances at the top were written down BEFORE the numbers "
-            "were computed, and a measure only counts as breached when the "
-            "whole confidence interval lies outside - that is what stops "
-            "us from moving the goalposts afterwards. Second, steps 1 and "
-            "2 are the team's slides 3 and 5, so I will not repeat them. "
-            "I start at step 3. If anyone asks who is accountable: Charles "
-            "and I jointly, there is no review planned, and the project "
-            "ends at submission - that is on the last slide rather than "
-            "this one.",
-    },
-    "fairness": {
-        "eyebrow": "STEP 3 \u00b7 FAIRNESS MEASURED, WITH CONFIDENCE INTERVALS",
-        "source": "Source: fairness_verification.py, parity_table_with_intervals.csv \u00b7 16",
-        "figure": ("folie_fairness_metrics.png", WIDE),
-        "notes":
-            "Four measures, because fairness is not one thing. Demographic "
-            "parity asks whether every group is approved equally often - "
-            "it is the crudest, and it ignores whether the groups differ. "
-            "Equal opportunity asks only about the people who really would "
-            "repay: of those, who gets through. Predictive parity asks "
-            "whether a yes means the same thing in every group. Three are "
-            "breached, one holds. The intervals matter: with 2,000 "
-            "resamples the equal-opportunity gap sits between 0.959 and "
-            "0.973, so it is a property of the model, not of which rows "
-            "landed in the test split. The eight measures are these four "
-            "at two cut-offs, 0.5 and 0.8. On dataset 1 all eight are "
-            "decided: six breached, two held, both of them predictive "
-            "parity. On dataset 2 the groups are far smaller - 120 over-61 "
-            "instead of 390 - and five of the eight stay undecided, "
-            "because the interval straddles the tolerance. Undecided is "
-            "not the same as fair, and we report it as undecided.",
-    },
-    "conflict": {
-        "eyebrow": "STEP 4 \u00b7 THE CONFLICT, GROUP BY GROUP",
-        "source": "Source: parity_by_group_with_intervals.csv, governance_decision.md \u00b7 17",
-        "figure": ("folie_equal_opportunity.png", WIDE),
-        "notes":
-            "Here is the measure that fails, in detail. Of the people who "
-            "really did get a loan, the model approves 92 percent in the "
-            "youngest group, 97 in the next, 89 in the next - and zero "
-            "among the over-61. Of 390 older applicants, 60 really were "
-            "approved, and the model approves none of them. Predictive "
-            "parity still holds at 0.005, which is the trap: by that one "
-            "measure the model looks fine. Both cannot be satisfied when "
-            "the groups differ this much - that is a proven result, "
-            "Chouldechova 2017 and Kleinberg 2016, not our failure. We "
-            "chose equal opportunity, because the harm that counts is to "
-            "someone who would have repaid. And we did not patch it: "
-            "removing the age field changes the gap by nothing, 0.966 "
-            "before and after, because the credit score carries the same "
-            "signal. Two likely questions. Is 88.7 percent good enough for "
-            "the 46-60 group? By our declared tolerance, yes: the three "
-            "younger groups differ by only 0.079, inside the 0.10 limit. "
-            "The whole breach is the over-61. And does choosing equal "
-            "opportunity mean the over-61 always go to a human? Not "
-            "directly - those are two separate things. The fairness choice "
-            "is what we report against; what actually routes them is the "
-            "weak-group rule, which fires because the within-group AUC "
-            "there is 0.52, below our 0.60 limit. The two happen to point "
-            "at the same group.",
-    },
-    "rules": {
-        "eyebrow": "STEPS 5 AND 6 \u00b7 WHEN A PERSON DECIDES, AND WHY",
-        "source": "Source: deferral.py, human_control.py, control_zones.csv \u00b7 18",
-        "figure": ("folie_regeln_zonen.png", WIDE),
-        "notes":
-            "Two kinds of rule. Three safety rules fire when there is no "
-            "basis for an answer at all: a missing field, a value outside "
-            "anything in training, or a group the model is demonstrably "
-            "poor on. Two evidence rules are candidates, and they have to "
-            "earn their place: a rule goes on only if the model is "
-            "measurably worse on the cases it catches, by at least 0.03. "
-            "Borderline qualifies - 77.7 percent against 85.0 overall. "
-            "Disagreement does not: 85.5 against 85.0, the model is "
-            "actually slightly better there. Switching it on would have "
-            "sent 2,257 of 7,738 cases to a person for nothing. That is "
-            "the control we rejected, and we rejected it on evidence. Note "
-            "what disagreement actually compares: both models run on every "
-            "applicant, and the rule fires when their two probabilities "
-            "differ by more than 0.50 - not the amounts, the "
-            "probabilities. The four zones below show where everything "
-            "lands. Sample audit is not a narrow band around the "
-            "threshold: it is every automatic refusal, so everything below "
-            "0.80 that no rule caught, and a tenth of that stream is read "
-            "by a person. The cases between 0.75 and 0.85 never get there "
-            "- the borderline rule pulls them into human review first. Two "
-            "thirds are answered automatically, 14.9 percent reach a "
-            "person, and every single over-61 case is in safe-stop, where "
-            "the system gives no answer at all. One word on the last "
-            "column: really approved is the share of people in that zone "
-            "who did get a loan in the data, the true label, not the "
-            "model's output.",
-    },
-    "contract": {
-        "eyebrow": "STEP 7A \u00b7 THE CONTRACT: FIX THE NUMBERS BEFORE ASKING",
-        "source": "Source: contract.py, evaluation.py, evaluation_mcnemar.csv \u00b7 19",
-        "figure": ("folie_contract.png", WIDE),
-        "notes":
-            "The design choice that makes the whole language part "
-            "measurable. Before Qwen is asked anything, the code writes a "
-            "list of every figure the answer is allowed to contain: the "
-            "probabilities, the maximum amount, the SHAP shares, the "
-            "applicant's own data. The model may quote from that list and "
-            "nothing else. Afterwards every number in the answer is "
-            "matched back against it, and every citation against the "
-            "passages actually retrieved. If a number or a citation fails "
-            "the check, the model gets one more try; if that fails too, a "
-            "fixed safe answer replaces its own. In 72 runs the fallback "
-            "was never needed. The three runs on the right are the "
-            "comparison: A is Qwen with the applicant's data only, B adds "
-            "our contract, C adds four retrieved passages on top. Only the "
-            "support changes, which is what makes it a fair test. Three "
-            "results, all on 24 questions over 4 applicants. Citations: "
-            "the full system cites "
-            "a real source in 15 of 15 source questions, the other two "
-            "runs in zero - exact McNemar p = 0.000061. Invented markers: "
-            "when the runs have no sources, all 24 answers invent one "
-            "anyway, p = 0.00000012. And 97.7 percent of the 131 figures "
-            "in run C trace back to something we computed. If anyone asks "
-            "what p means: it is how likely a split this lopsided would be "
-            "if the two set-ups were really equally good. Below 0.05 we "
-            "call the difference real; 0.000061 means it would happen "
-            "about once in sixteen thousand times by chance.",
-    },
-    "language": {
-        "eyebrow": "STEP 7B \u00b7 WHAT THE LANGUAGE MODEL DOES BY ITSELF",
-        "source": "Source: llm.py, counterfactual_age.py, evaluation_rubric_results.csv \u00b7 20",
-        "figure": ("folie_sprachmodell.png", WIDE),
-        "notes":
-            "Three findings about the model rather than the pipeline. "
-            "First, the prompt. Version 1 said 'cite the source it came "
-            "from' - a clear principle, and it produced zero citations in "
-            "15 questions. Version 2 said where to put it: 'end every "
-            "paragraph about regulation with the marker, like [2]' - 15 of "
-            "15. Same rule, different wording. You get what you write, not "
-            "what you mean. Second, the age test, which is the cleanest "
-            "experiment here: the same applicant is sent twice, as 30 and "
-            "as 67, with every model output held exactly fixed, so a "
-            "difference can only come from the language. Age was brought "
-            "up 5 times for the older applicant against 1 - the direction "
-            "is clear but 24 pairs is not enough, p = 0.219 - and in "
-            "discouraging language there was no difference at all. Third, "
-            "the human rating: the contract makes answers more correct and "
-            "measurably harder to read. That is a trade-off to state, not "
-            "to hide.",
-    },
-    "notcovered": {
-        "eyebrow": "THE LIMITS \u00b7 WHAT THIS RECORD DOES NOT COVER",
-        "source": "Source: provenance.json, governance_decision.md \u00b7 21",
-        "figure": ("folie_nicht_abgedeckt.png", WIDE),
-        "notes":
-            "I want to end on this rather than on the results. Everything "
-            "on the guiding slide had a file behind it - except these six, "
-            "and they are declarations, not measurements. There is no "
-            "operating owner after submission and no review date, because "
-            "the project ends. We cannot say how long a human review takes "
-            "or how often a person would overrule the model, because no "
-            "person ever worked a case. Learning-to-defer would be the "
-            "next step and we did not take it. Both datasets are "
-            "synthetic, so every number describes invented people. And the "
-            "0.10 tolerance was set by us, not derived from a regulation - "
-            "declaring it in advance keeps it honest, but it is still our "
-            "number. A governance record that lists only what went well is "
-            "not a governance record.",
-    },
-    "shap": {
-        "eyebrow": "BACKUP \u00b7 SHAP, THE MODEL EXPLANATION",
-        "title": "How much each detail mattered, for one applicant",
-        "blocks": [
-            ("WHAT IT IS",
-             "A share of the decision given to every input, for one applicant, not in general."),
-            ("HOW IT IS DEFINED",
-             "Start from the average applicant. Add each detail in turn. The change it causes is its share."),
-        ],
-        "line": "Credit score 0.210, income 0.065, loan-to-income 0.021, age 0.016. "
-                "Additivity error 1.6 \u00d7 10\u207b\u00b9\u2074 over 1,000 applicants.",
-        "source": "Source: shap_importance_dataset_1.csv, shap_fidelity.csv \u00b7 backup",
-        "figure": ("shap_beeswarm_dataset_1.png", 7.9, 2.32, 4.0),
-        "notes":
-            "Hidden slide, for the question round. Every dot is one "
-            "applicant. Left of the middle line the detail pushed the "
-            "approval chance down, right of it up; the colour is whether "
-            "that applicant's value was high or low. Credit score is three "
-            "times the next input. SHAP is exact for tree models, not an "
-            "approximation: the shares add up to the prediction, and over "
-            "1,000 applicants the largest error in that sum is 1.6 times "
-            "ten to the minus fourteen. The top five shares are what the "
-            "assistant is allowed to put into words. The team covers SHAP "
-            "on slide 6; this slide is here only if someone asks for the "
-            "exactness check or the per-feature numbers.",
-    },
-}
-
-
-def duplicate_slides():
+def duplicate_slides(count):
     shutil.copy("base.pptx", "work.pptx")
     after = "slide13.xml"
-    created = []
-    for template, key in PLAN:
+    for _ in range(count):
         out = subprocess.run(
             [UV, "run", "--with", "python-pptx", "--with", "lxml",
              "--with", "defusedxml", "--with", "Pillow", "python",
              str(SKILL / "scripts" / "add_slide.py"),
-             "work.pptx", "slide" + template + ".xml",
+             "work.pptx", "slide13.xml",
              "-o", "work2.pptx", "--after", after],
             capture_output=True, text=True, cwd=HERE)
         found = re.search(r"Created ppt/slides/(slide\d+\.xml)",
                           out.stdout or "")
         if not found:
-            print("  failed:", key,
-                  ((out.stdout or "") + (out.stderr or ""))[-250:])
-            return None
+            print("  failed:", ((out.stdout or "") + (out.stderr or ""))[-250:])
+            return False
         after = found.group(1)
-        created.append(key)
         shutil.move(HERE / "work2.pptx", HERE / "work.pptx")
-    return created
+    return True
+
+
+def strip_slide(slide):
+    """Keep the eyebrow, the title and the source line. Drop the rest.
+
+    The template slide carries a layout we do not want; what we do want is
+    its three framing text boxes, which already have the deck's fonts and
+    positions.
+    """
+
+    from pptx.util import Emu
+
+    boxes = [s for s in slide.shapes
+             if s.has_text_frame and s.text_frame.text.strip()]
+    boxes.sort(key=lambda s: s.top)
+    eyebrow, title, source = boxes[0], boxes[1], boxes[-1]
+
+    for shape in list(slide.shapes):
+        if shape not in (eyebrow, title, source):
+            shape._element.getparent().remove(shape._element)
+
+    # The title box in this template is two lines tall; one is enough.
+    title.height = Emu(int(0.62 * 914400))
+    return eyebrow, title, source
 
 
 def set_text(shape, text):
+    """Replace the text, keeping the first run's formatting."""
     paragraph = shape.text_frame.paragraphs[0]
     if not paragraph.runs:
         return
@@ -327,18 +396,152 @@ def set_text(shape, text):
             run.text = ""
 
 
-def drop(shape):
-    shape._element.getparent().remove(shape._element)
+def add_text(slide, x, y, width, height, pieces, size=13, colour=INK,
+             bold=False, align="left", space_after=0):
+    """A plain text box. `pieces` is a string or a list of (text, bold)."""
+
+    from pptx.dml.color import RGBColor
+    from pptx.enum.text import PP_ALIGN
+    from pptx.util import Inches, Pt
+
+    box = slide.shapes.add_textbox(Inches(x), Inches(y),
+                                   Inches(width), Inches(height))
+    frame = box.text_frame
+    frame.word_wrap = True
+    frame.margin_left = Inches(0)
+    frame.margin_right = Inches(0)
+    frame.margin_top = Inches(0)
+    frame.margin_bottom = Inches(0)
+
+    if isinstance(pieces, str):
+        pieces = [(pieces, bold)]
+
+    paragraph = frame.paragraphs[0]
+    paragraph.alignment = {"left": PP_ALIGN.LEFT, "center": PP_ALIGN.CENTER,
+                           "right": PP_ALIGN.RIGHT}[align]
+    if space_after:
+        paragraph.space_after = Pt(space_after)
+    for text, is_bold in pieces:
+        run = paragraph.add_run()
+        run.text = text
+        run.font.size = Pt(size)
+        run.font.bold = is_bold
+        run.font.color.rgb = RGBColor.from_string(colour)
+    return box
+
+
+def add_table(slide, x, y, spec, body_size=12, head_size=11):
+    """A native PowerPoint table. Every cell stays editable.
+
+    Row height comes from the spec where a table needs it: PowerPoint
+    grows a row whose text wraps, and a grown row pushes everything below
+    it off the slide, so a two-line cell has to be paid for here.
+    """
+
+    row_height = spec.get("row_height", 0.34)
+    head_height = spec.get("head_height", 0.36)
+
+    from pptx.dml.color import RGBColor
+    from pptx.enum.text import MSO_ANCHOR
+    from pptx.util import Inches, Pt
+
+    header = spec["header"]
+    rows = spec["rows"]
+    widths = spec["columns"]
+    highlight = spec.get("highlight")
+
+    total_width = sum(widths)
+    total_height = head_height + len(rows) * row_height
+
+    graphic = slide.shapes.add_table(len(rows) + 1, len(header),
+                                     Inches(x), Inches(y),
+                                     Inches(total_width),
+                                     Inches(total_height))
+    table = graphic.table
+    table.first_row = True
+    table.horz_banding = False
+
+    for index, width in enumerate(widths):
+        table.columns[index].width = Inches(width)
+    table.rows[0].height = Inches(head_height)
+    for index in range(len(rows)):
+        table.rows[index + 1].height = Inches(row_height)
+
+    def write(cell, text, size, colour, bold, fill):
+        cell.fill.solid()
+        cell.fill.fore_color.rgb = RGBColor.from_string(fill)
+        cell.margin_left = Inches(0.10)
+        cell.margin_right = Inches(0.08)
+        cell.margin_top = Inches(0.02)
+        cell.margin_bottom = Inches(0.02)
+        cell.vertical_anchor = MSO_ANCHOR.MIDDLE
+        frame = cell.text_frame
+        frame.word_wrap = True
+        paragraph = frame.paragraphs[0]
+        for old in list(paragraph.runs):
+            old._r.getparent().remove(old._r)
+        run = paragraph.add_run()
+        run.text = text
+        run.font.size = Pt(size)
+        run.font.bold = bold
+        run.font.color.rgb = RGBColor.from_string(colour)
+
+    for column, text in enumerate(header):
+        write(table.cell(0, column), text, head_size, WHITE, True, INK)
+
+    for index, values in enumerate(rows):
+        marked = index == highlight
+        fill = TINT_RUST if marked else (PAPER if index % 2 else WHITE)
+        colour = RUST if marked else INK
+        for column, text in enumerate(values):
+            bold = marked or column == 0 or (
+                text.isupper() and len(text) <= 6)
+            write(table.cell(index + 1, column), text, body_size,
+                  colour, bold, fill)
+
+    return y + total_height
+
+
+def add_message(slide, x, y, width, text, colour):
+    """The closing line, in a tinted box. Still editable text."""
+
+    from pptx.dml.color import RGBColor
+    from pptx.enum.shapes import MSO_SHAPE
+    from pptx.enum.text import MSO_ANCHOR
+    from pptx.util import Inches, Pt
+
+    tint = {RUST: TINT_RUST, GREEN: TINT_GREEN, BLUE: "EEF3F9"}.get(
+        colour, TINT_GREY)
+    height = 0.62 if len(text) < 115 else 0.88
+
+    box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,
+                                 Inches(x), Inches(y),
+                                 Inches(width), Inches(height))
+    box.fill.solid()
+    box.fill.fore_color.rgb = RGBColor.from_string(tint)
+    box.line.color.rgb = RGBColor.from_string(colour)
+    box.line.width = Pt(1.5)
+    box.shadow.inherit = False
+
+    frame = box.text_frame
+    frame.word_wrap = True
+    frame.margin_left = Inches(0.18)
+    frame.margin_right = Inches(0.18)
+    frame.margin_top = Inches(0.04)
+    frame.margin_bottom = Inches(0.04)
+    frame.vertical_anchor = MSO_ANCHOR.MIDDLE
+    paragraph = frame.paragraphs[0]
+    run = paragraph.add_run()
+    run.text = text
+    run.font.size = Pt(13)
+    run.font.bold = True
+    run.font.color.rgb = RGBColor.from_string(INK)
+    return y + height
 
 
 def set_notes(slide, donor, text):
-    """Write speaker notes, borrowing a body placeholder if there is none.
-
-    This deck's notes master declares no placeholders, so python-pptx
-    creates an empty notes slide and `notes_text_frame` comes back None.
-    The team's own slides do have one, so the shape is copied from there
-    and filled with the new text.
-    """
+    """Speaker notes. The notes master here declares no placeholder, so
+    the shape is borrowed from a slide that has one."""
 
     notes = slide.notes_slide
     if notes.notes_text_frame is None:
@@ -347,144 +550,65 @@ def set_notes(slide, donor, text):
     notes.notes_text_frame.text = text
 
 
-def hide(presentation, index):
-    """Mark a slide as not shown when presenting.
+def build_slide(slide, content, donor):
+    eyebrow, title, source = strip_slide(slide)
+    set_text(eyebrow, content["eyebrow"])
+    set_text(title, content["title"])
+    set_text(source, content["source"])
 
-    python-pptx has no API for this; PowerPoint reads it off the `show`
-    attribute of the slide part's root element.
-    """
+    y = 2.05
 
-    presentation.slides[index]._element.set("show", "0")
+    if content.get("statement"):
+        add_text(slide, MARGIN, y, BODY_WIDTH, 0.34,
+                 content["statement"], size=14, colour=MUTED)
+        y += 0.42
 
+    if content.get("reasons"):
+        for headline, detail in content["reasons"]:
+            add_text(slide, MARGIN, y, BODY_WIDTH, 0.24,
+                     headline, size=13, colour=INK, bold=True)
+            y += 0.26
+            add_text(slide, MARGIN + 0.22, y, BODY_WIDTH - 0.22, 0.24,
+                     detail, size=12, colour=MUTED)
+            y += 0.28 if len(detail) < 95 else 0.50
+        y += 0.14
 
-def place_figure(slide, figure):
-    """Put the picture on the slide, either at a fixed spot or fitted.
+    if content.get("steps"):
+        column = BODY_WIDTH / 3 - 0.2
+        for place, (headline, detail) in enumerate(content["steps"]):
+            x = MARGIN + place * (column + 0.3)
+            add_text(slide, x, y, column, 0.26, headline,
+                     size=13, colour=BLUE, bold=True)
+            add_text(slide, x, y + 0.30, column, 1.85, detail,
+                     size=11.5, colour=MUTED)
+        y += 2.28
 
-    A fitted picture is scaled to the largest size that fits the given box
-    and centred in it, so a figure whose shape changes cannot grow into the
-    source line underneath.
-    """
+    if content.get("table"):
+        y = add_table(slide, MARGIN, y, content["table"]) + 0.14
 
-    from PIL import Image
-    from pptx.util import Inches
+    if content.get("table2"):
+        y = add_table(slide, MARGIN, y, content["table2"]) + 0.14
 
-    name = figure[0]
-    path = FIGURES / name
-    if not path.exists():
-        print("    figure missing:", name)
-        return
+    add_message(slide, MARGIN, y, BODY_WIDTH,
+                content["message"], content["message_colour"])
 
-    if isinstance(figure[1], str) and figure[1].startswith("fit:"):
-        top, box_width, box_height = [float(v)
-                                      for v in figure[1][4:].split(",")]
-        with Image.open(path) as picture:
-            shape = picture.width / picture.height
-        width = min(box_width, box_height * shape)
-        height = width / shape
-        slide.shapes.add_picture(
-            str(path),
-            Inches((13.333 - width) / 2),
-            Inches(top + (box_height - height) / 2),
-            width=Inches(width))
-        return
-
-    _, x, y, width = figure
-    slide.shapes.add_picture(str(path), Inches(x), Inches(y),
-                             width=Inches(width))
-
-
-def fill(slide, content):
-    """Map content by what each box is, not by reading order.
-
-    Reading order is not enough: in a two-column layout the right column's
-    label sorts before the left column's text, which once put an
-    85-character sentence into a 0.26-inch label box.
-    """
-
-    from pptx.util import Emu
-
-    boxes = [s for s in slide.shapes
-             if s.has_text_frame and s.text_frame.text.strip()]
-    boxes.sort(key=lambda s: s.top)
-
-    set_text(boxes[0], content["eyebrow"])
-    set_text(boxes[-1], content["source"])
-
-    if "title" in content:
-        set_text(boxes[1], content["title"])
-        middle = boxes[2:-1]
-    else:
-        # A full-width figure carries its own heading; the title box would
-        # repeat it and steal the height the picture needs.
-        drop(boxes[1])
-        middle = boxes[2:-1]
-
-    line = [s for s in middle if Emu(s.width).inches > 10]
-    blocks = [s for s in middle if Emu(s.width).inches <= 10]
-    wanted = content.get("blocks", [])
-
-    # With a figure the text stacks down the LEFT column, because the right
-    # half is where the picture goes.
-    if "figure" in content:
-        order = lambda s: (s.left, s.top)
-    else:
-        order = lambda s: (round(Emu(s.top).inches * 2), s.left)
-
-    labels = sorted([s for s in blocks if Emu(s.height).inches <= 0.40],
-                    key=order)
-    texts = sorted([s for s in blocks if Emu(s.height).inches > 0.40],
-                   key=order)
-
-    for place in range(min(len(labels), len(texts))):
-        if place < len(wanted):
-            set_text(labels[place], wanted[place][0])
-            set_text(texts[place], wanted[place][1])
-        else:
-            drop(labels[place])
-            drop(texts[place])
-
-    if line:
-        if "line" in content:
-            set_text(line[0], content["line"])
-        else:
-            drop(line[0])
-
-    # The rounded cards the template draws behind the text blocks carry no
-    # text of their own; under a full-width figure they would show as empty
-    # boxes.
-    if "figure" in content and not wanted:
-        for shape in list(slide.shapes):
-            if shape.has_text_frame and not shape.text_frame.text.strip():
-                drop(shape)
-
-    if "figure" in content:
-        place_figure(slide, content["figure"])
+    if content.get("notes"):
+        set_notes(slide, donor, content["notes"])
 
 
 def main():
     print("Duplicating templates")
-    created = duplicate_slides()
-    if created is None:
+    if not duplicate_slides(len(SLIDES)):
         return 1
 
     from pptx import Presentation
     pres = Presentation("work.pptx")
     print()
-    for place, key in enumerate(created):
-        content = CONTENT[key]
-        index = 13 + place
-        slide = pres.slides[index]
-        fill(slide, content)
-        if content.get("notes"):
-            set_notes(slide, pres.slides[12], content["notes"])
-        if key in HIDDEN:
-            hide(pres, index)
-        marks = ("  + figure" if "figure" in content else "") + \
-                ("  [HIDDEN]" if key in HIDDEN else "")
-        name = content.get("title") or content["eyebrow"]
-        print("  slide", 14 + place, "-", name, marks)
+    for place, content in enumerate(SLIDES):
+        build_slide(pres.slides[13 + place], content, pres.slides[12])
+        print("  slide", 14 + place, "-", content["title"])
 
-    out = "Trustworthy Loan Assessment Assistant - 22 slides.pptx"
+    out = "Trustworthy Loan Assessment Assistant - simple.pptx"
     pres.save(out)
     print()
     print("saved:", out)
@@ -493,3 +617,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
