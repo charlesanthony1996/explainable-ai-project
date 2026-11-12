@@ -1,0 +1,5 @@
+dimension,rater_1,rater_2,answers_both_scored,exact_agreement,kappa
+correctness,Charles,Dayas,30,0.633,0.453
+faithfulness,Charles,Dayas,30,0.633,0.363
+citations,Charles,Dayas,30,0.6,0.394
+correct_refusal,Charles,Dayas,30,0.833,0.38
