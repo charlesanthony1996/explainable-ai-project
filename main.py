@@ -163,6 +163,12 @@ def stage_overview():
     return make_overview_figures()
 
 
+def stage_slides():
+    from explainable_ai_project.slide_figures import make_slide_figures
+
+    return make_slide_figures()
+
+
 # ------------------------------------------------------------------
 # Whole training pathway
 # ------------------------------------------------------------------
@@ -236,6 +242,7 @@ STAGES = {
     "rag": stage_rag,
     "retrieval_check": stage_retrieval_check,
     "overview": stage_overview,
+    "slides": stage_slides,
     "train": stage_train,
     "ask": stage_ask,
     "evaluate": stage_evaluate,
