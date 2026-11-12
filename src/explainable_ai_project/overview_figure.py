@@ -29,6 +29,7 @@ FIGURES_FOLDER = PROJECT_ROOT / "results" / "figures"
 OVERVIEW_FILE = FIGURES_FOLDER / "uebersicht_gesamt.png"
 EVALUATION_FILE = FIGURES_FOLDER / "uebersicht_evaluation.png"
 GOVERNANCE_FILE = FIGURES_FOLDER / "uebersicht_governance.png"
+MEASUREMENT_FILE = FIGURES_FOLDER / "uebersicht_messung.png"
 
 # A second home for the figures, so they can be embedded in the notes. Skipped
 # without complaint if the vault is not on this machine.
@@ -596,12 +597,182 @@ def draw_governance():
     return figure
 
 
+# ------------------------------------------------------------------
+# Diagram 4: measurement and governance
+#
+# The other three show what the system does. This one shows how the parts
+# of the checking layer hang together, which is the thing that is hard to
+# hold in your head: two separate places get measured - the model and the
+# answer - and both feed one written decision.
+#
+# Every box carries the command that produces it, the question it answers
+# and the result it gave, so the diagram doubles as an index.
+# ------------------------------------------------------------------
+
+def draw_measurement():
+    figure, axes = new_canvas(
+        17, 12.5,
+        "Messung und Governance - wie die Schritte zusammenhaengen",
+        "Zwei Stellen werden geprueft: das Modell und die Antwort. "
+        "Beides zusammen traegt eine schriftliche Entscheidung.",
+    )
+
+    def step(x, y, width, height, number, name, command, question, result,
+             colour):
+        axes.add_patch(FancyBboxPatch(
+            (x, y), width, height,
+            boxstyle="round,pad=0.35,rounding_size=0.7",
+            linewidth=1.8, edgecolor=colour, facecolor="white", zorder=2))
+        axes.add_patch(FancyBboxPatch(
+            (x, y + height - 1.5), width, 1.5,
+            boxstyle="round,pad=0.35,rounding_size=0.7",
+            linewidth=0, facecolor=tint(colour, 0.86), zorder=2))
+        axes.text(x + width / 2, y + height - 0.45, number + "  " + name,
+                  ha="center", va="top", fontsize=11, fontweight="bold",
+                  color=colour, zorder=4)
+        axes.text(x + 0.5, y + height - 2.0, command,
+                  ha="left", va="top", fontsize=8.2, color="#555555",
+                  family="monospace", zorder=4)
+        axes.text(x + 0.5, y + height - 3.3, "FRAGE", ha="left", va="top",
+                  fontsize=7.8, fontweight="bold", color="#888888", zorder=4)
+        axes.text(x + 0.5, y + height - 4.1, question, ha="left", va="top",
+                  fontsize=8.6, color="#222222", zorder=4)
+        # The result sits a fixed distance above the floor, with room for
+        # three lines beneath the label. Anchoring it to the bottom edge is
+        # what pushed the text through the border in the first version.
+        axes.text(x + 0.5, y + 5.0, "ERGEBNIS", ha="left", va="top",
+                  fontsize=7.8, fontweight="bold", color="#888888", zorder=4)
+        axes.text(x + 0.5, y + 4.1, result, ha="left", va="top",
+                  fontsize=8.6, color=colour, fontweight="bold", zorder=4)
+
+    # ---- band 1: the model ----------------------------------------
+    axes.add_patch(FancyBboxPatch(
+        (1.5, 62.0), 97, 30.0,
+        boxstyle="round,pad=0.4,rounding_size=1.0",
+        linewidth=1.3, edgecolor="#aaaaaa", facecolor="#fbfbfa", zorder=0))
+    axes.text(3.5, 91.0, "EBENE 1  -  WAS DAS MODELL TUT",
+              ha="left", va="top", fontsize=11.5, fontweight="bold",
+              color="#333333")
+    axes.text(3.5, 88.5,
+              "Geprueft wird der Random Forest, bevor ein Sprachmodell "
+              "ueberhaupt beteiligt ist.",
+              ha="left", va="top", fontsize=9, color="#666666")
+
+    step(4.0, 66.0, 45.0, 17.0, "1", "Fairness mit Konfidenzintervallen",
+         "uv run main.py verify_fairness",
+         "Behandelt das Modell Altersgruppen unterschiedlich -\n"
+         "und ist der Unterschied groesser als der Zufall?",
+         "Luecke real: 0,966 (Spanne 0,959-0,973).\n"
+         "Bei Datensatz 2: 4 von 8 Massen unentscheidbar.",
+         RED)
+
+    step(51.5, 66.0, 45.0, 17.0, "2", "Vier Kontrollzonen",
+         "uv run main.py zones",
+         "Welche Faelle darf das System entscheiden,\n"
+         "welche nicht - und wer schaut nach?",
+         "61+ zu 100 % safe-stop: kein automatisches\n"
+         "Urteil, nur eine Warteschlange.",
+         ORANGE)
+
+    # ---- band 2: the answer ---------------------------------------
+    axes.add_patch(FancyBboxPatch(
+        (1.5, 26.5), 97, 31.0,
+        boxstyle="round,pad=0.4,rounding_size=1.0",
+        linewidth=1.3, edgecolor="#aaaaaa", facecolor="#fbfbfa", zorder=0))
+    axes.text(3.5, 56.3, "EBENE 2  -  WAS DAS SPRACHMODELL DARAUS MACHT",
+              ha="left", va="top", fontsize=11.5, fontweight="bold",
+              color="#333333")
+    axes.text(3.5, 53.9,
+              "Dieselben Modellzahlen, drei verschiedene Prompts. "
+              "Nur der Prompt unterscheidet sich.",
+              ha="left", va="top", fontsize=9, color="#666666")
+
+    step(4.0, 29.0, 22.0, 19.0, "3", "Zahlen und Zitate",
+         "uv run main.py evaluate",
+         "Sagt die Antwort nur, was\ngerechnet wurde - und nennt\nsie ihre Quelle?",
+         "Zitate 15/15 gegen 0/15.\nErfundene Marker 24/24\ngegen 0/24.",
+         BLUE)
+
+    step(27.5, 29.0, 22.0, 19.0, "4", "Alterspaare",
+         "uv run main.py counterfactual",
+         "Antwortet es anders, wenn nur\ndas Alter anders ist - bei\ngleichen Modellzahlen?",
+         "Alter haeufiger genannt (5:1),\naber nicht signifikant.\nKein Unterschied beim Raten.",
+         PURPLE)
+
+    step(51.0, 29.0, 22.0, 19.0, "5", "Handbewertung",
+         "uv run main.py rubric",
+         "Ist die Antwort richtig - und\nversteht ein Antragsteller sie?\nZwei Personen, verblindet.",
+         "Korrekter mit Contract,\naber schlechter verstaendlich.\nBeide Bewerter gleich geordnet.",
+         TEAL)
+
+    step(74.5, 29.0, 22.0, 19.0, "6", "Zweiter Lauf",
+         "(Dayas: 45 Fragen, qwen3-4B)",
+         "Kommt eine unabhaengige\nzweite Umsetzung zum\nselben Schluss?",
+         "Ja. Beide: Faktenblatt\nentfernt erfundene Zahlen,\nCodepruefung sichert Deferral.",
+         GOLD)
+
+    # arrows from both bands into governance
+    for x in (26.5, 74.0):
+        arrow(axes, (x, 65.7), (x, 58.0), colour="#999999", linewidth=2.2)
+    for x in (15.0, 38.5, 62.0, 85.5):
+        arrow(axes, (x, 28.7), (x, 20.3), colour="#999999", linewidth=2.2)
+
+    # ---- band 3: governance ---------------------------------------
+    axes.add_patch(FancyBboxPatch(
+        (1.5, 1.5), 97, 18.0,
+        boxstyle="round,pad=0.4,rounding_size=1.0",
+        linewidth=2.0, edgecolor=GREEN, facecolor="#f5faf6", zorder=0))
+    axes.text(50, 18.1,
+              "EBENE 3  -  DIE ENTSCHEIDUNG, SCHRIFTLICH",
+              ha="center", va="top", fontsize=11.5, fontweight="bold",
+              color=GREEN)
+    axes.text(50, 15.9,
+              "uv run main.py provenance   ->   docs/governance_decision.md "
+              "+ results/provenance.json",
+              ha="center", va="top", fontsize=8.6, color="#555555",
+              family="monospace")
+
+    decisions = [
+        ("DER KONFLIKT",
+         "Predictive parity haelt (0,005),\ndemographic parity nicht (0,000).\n"
+         "Beides geht nicht gleichzeitig."),
+        ("DIE WAHL",
+         "Wir halten uns an equal opportunity\nund melden den Verstoss, statt\n"
+         "ihn zu entfernen."),
+        ("WARUM NICHT REPARIEREN",
+         "Alter entfernen aendert nichts -\nder Kreditscore traegt dieselbe\n"
+         "Information."),
+        ("WER UND WANN",
+         "Verantwortlich: beide gemeinsam.\nReview: keines, das Projekt endet\n"
+         "mit der Abgabe."),
+        ("ABSCHALT-AUSLOESER",
+         "Parity-Intervall unter 0,80 ·\nGruppen-AUC unter 0,60 ·\n"
+         "Deferral ueber 25 % · echte Daten."),
+    ]
+    for number, (label, text) in enumerate(decisions):
+        x = 3.5 + number * 18.9
+        axes.text(x, 13.2, label, ha="left", va="top", fontsize=8.6,
+                  fontweight="bold", color=GREEN)
+        axes.text(x, 11.5, text, ha="left", va="top", fontsize=8.4,
+                  color="#222222")
+
+    axes.text(50, 2.6,
+              "Der rote Faden: Ebene 1 misst, ob das Modell fair ist. "
+              "Ebene 2 misst, ob die Antwort ehrlich ist. "
+              "Ebene 3 schreibt auf, was wir mit dem Befund tun.",
+              ha="center", va="bottom", fontsize=9.2, color="#333333",
+              style="italic")
+
+    return figure
+
+
 def make_overview_figures():
     FIGURES_FOLDER.mkdir(parents=True, exist_ok=True)
 
     for drawer, path in [(draw_overview, OVERVIEW_FILE),
                          (draw_evaluation, EVALUATION_FILE),
-                         (draw_governance, GOVERNANCE_FILE)]:
+                         (draw_governance, GOVERNANCE_FILE),
+                         (draw_measurement, MEASUREMENT_FILE)]:
         figure = drawer()
         figure.savefig(path, dpi=150, bbox_inches="tight", facecolor="white")
         plt.close(figure)

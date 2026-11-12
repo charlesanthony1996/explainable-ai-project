@@ -1,0 +1,4 @@
+comparison,meaning,measure,questions_paired,mean_first_run,mean_second_run,difference,ci95_low,ci95_high,interval_excludes_0,second_better_on,first_better_on,ties
+A vs C,whole improvement,numbers_ok,45,0.556,1.0,0.444,0.311,0.6,True,20,0,25
+B vs C,what RAG adds,numbers_ok,45,1.0,1.0,0.0,0.0,0.0,False,0,0,45
+A vs B,what the models and SHAP add,numbers_ok,45,0.556,1.0,0.444,0.311,0.578,True,20,0,25
